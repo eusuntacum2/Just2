@@ -1,0 +1,39 @@
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe.config
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.pdb
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Form1.resources
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Properties.Resources.resources
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.exe
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.pdb
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe.config
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.exe
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.pdb
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.pdb
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\ResolveAssemblyReference.cache
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Form1.resources
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Properties.Resources.resources
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+c:\Documents\PortalMJ\Proiecte\PortalWS\PortalWS\PortalWSClient\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe.config
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.pdb
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Form1.resources
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Properties.Resources.resources
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.exe
+C:\Projects\Portaj Just.ro\Proiecte\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.pdb
+C:\WebServicePortal\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Form1.resources
+C:\WebServicePortal\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.Properties.Resources.resources
+C:\WebServicePortal\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.csproj.GenerateResource.Cache
+C:\WebServicePortal\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.exe
+C:\WebServicePortal\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe.config
+C:\WebServicePortal\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.exe
+C:\WebServicePortal\PortalWS\PortalWSClient\bin\Debug\PortalWSClient.pdb
+C:\WebServicePortal\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.pdb
+C:\WebServicePortal\PortalWS\PortalWSClient\obj\x86\Debug\PortalWSClient.csprojResolveAssemblyReference.cache
