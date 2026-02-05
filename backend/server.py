@@ -152,6 +152,38 @@ async def get_admin_user(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
+# ============== DIACRITIC NORMALIZATION ==============
+
+def normalize_diacritics(text: str) -> str:
+    """Remove diacritics for case-insensitive search (Iasi = IAȘI)"""
+    if not text:
+        return ""
+    # Normalize to NFD form (decompose characters)
+    normalized = unicodedata.normalize('NFD', text)
+    # Remove combining characters (diacritics)
+    without_diacritics = ''.join(c for c in normalized if unicodedata.category(c) != 'Mn')
+    return without_diacritics.upper()
+
+def detect_search_type(term: str) -> str:
+    """Detect if search term is a case number or party name"""
+    # Case number pattern: digits/digits/digits (e.g., 123/45/2024)
+    case_pattern = r'^\d+/\d+/\d{4}$'
+    if re.match(case_pattern, term.strip()):
+        return "Număr dosar"
+    return "Nume parte"
+
+def find_matching_institutie(search_term: str) -> Optional[str]:
+    """Find institution key by name with diacritic-insensitive matching"""
+    normalized_search = normalize_diacritics(search_term)
+    for key, name in INSTITUTII_MAP.items():
+        if normalize_diacritics(name) == normalized_search or normalize_diacritics(key) == normalized_search:
+            return key
+    # Partial match
+    for key, name in INSTITUTII_MAP.items():
+        if normalized_search in normalize_diacritics(name):
+            return key
+    return None
+
 # ============== SOAP SERVICE ==============
 
 def get_soap_client():
