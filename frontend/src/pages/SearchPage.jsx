@@ -297,7 +297,7 @@ const SearchPage = () => {
                                         <SelectValue placeholder="Toate instituțiile" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">Toate instituțiile</SelectItem>
+                                        <SelectItem value="all">Toate instituțiile</SelectItem>
                                         {institutii.map((inst) => (
                                             <SelectItem key={inst} value={inst}>
                                                 {formatInstitutie(inst)}
