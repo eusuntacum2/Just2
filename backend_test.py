@@ -79,7 +79,35 @@ class JudicialInstitutionsAPITester:
             use_auth=False
         )
         if success and 'institutii' in response:
-            print(f"   Found {len(response['institutii'])} institutions")
+            institutii = response['institutii']
+            print(f"   Found {len(institutii)} institutions")
+            
+            # Check structure - each institution should have key and name
+            if len(institutii) > 0:
+                first_inst = institutii[0]
+                if 'key' in first_inst and 'name' in first_inst:
+                    print(f"   ✅ Institution structure correct: {first_inst['key']} -> {first_inst['name']}")
+                else:
+                    print(f"   ❌ Institution structure incorrect: {first_inst}")
+                    return False
+            
+            # Check alphabetical sorting by name
+            names = [inst['name'] for inst in institutii]
+            sorted_names = sorted(names)
+            if names == sorted_names:
+                print(f"   ✅ Institutions are sorted alphabetically")
+            else:
+                print(f"   ❌ Institutions are NOT sorted alphabetically")
+                print(f"   First few: {names[:5]}")
+                print(f"   Should be: {sorted_names[:5]}")
+                return False
+            
+            # Check for expected number of institutions (around 232)
+            if len(institutii) >= 200:
+                print(f"   ✅ Institution count looks correct: {len(institutii)}")
+            else:
+                print(f"   ⚠️  Institution count seems low: {len(institutii)}")
+        
         return success
 
     def test_public_search_dosare(self):
