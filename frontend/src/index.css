@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,56 +6,51 @@
 
 @layer base {
     :root {
-        /* Paper & Ink - Light Mode */
-        --background: 48 17% 97%;
-        --foreground: 215 28% 17%;
+        /* Clean Light Theme - Airy & Professional */
+        --background: 210 20% 98%;
+        --foreground: 220 20% 20%;
         --card: 0 0% 100%;
-        --card-foreground: 215 28% 17%;
+        --card-foreground: 220 20% 20%;
         --popover: 0 0% 100%;
-        --popover-foreground: 215 28% 17%;
-        --primary: 215 28% 17%;
+        --popover-foreground: 220 20% 20%;
+        --primary: 220 70% 50%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 214 32% 91%;
-        --secondary-foreground: 215 28% 17%;
-        --accent: 6 64% 47%;
+        --secondary: 220 15% 94%;
+        --secondary-foreground: 220 20% 30%;
+        --accent: 220 70% 50%;
         --accent-foreground: 0 0% 100%;
-        --muted: 210 40% 96%;
-        --muted-foreground: 215 16% 47%;
-        --border: 214 32% 91%;
-        --input: 214 32% 91%;
-        --ring: 215 28% 17%;
-        --chart-1: 6 64% 47%;
-        --chart-2: 43 74% 49%;
-        --chart-3: 215 28% 17%;
-        --chart-4: 215 16% 47%;
-        --chart-5: 214 32% 91%;
-        --radius: 0rem;
+        --muted: 220 15% 94%;
+        --muted-foreground: 220 10% 50%;
+        --border: 220 15% 90%;
+        --input: 220 15% 90%;
+        --ring: 220 70% 50%;
+        --chart-1: 220 70% 50%;
+        --chart-2: 160 60% 45%;
+        --chart-3: 280 60% 50%;
+        --chart-4: 30 80% 55%;
+        --chart-5: 340 70% 50%;
+        --radius: 0.5rem;
     }
 
     .dark {
-        /* Obsidian & Gold - Dark Mode */
-        --background: 0 0% 4%;
-        --foreground: 214 32% 91%;
-        --card: 0 0% 7%;
-        --card-foreground: 214 32% 91%;
-        --popover: 0 0% 7%;
-        --popover-foreground: 214 32% 91%;
-        --primary: 43 74% 52%;
-        --primary-foreground: 0 0% 4%;
-        --secondary: 240 4% 16%;
-        --secondary-foreground: 214 32% 91%;
-        --accent: 43 74% 52%;
-        --accent-foreground: 0 0% 4%;
-        --muted: 240 4% 16%;
-        --muted-foreground: 240 5% 65%;
-        --border: 240 4% 16%;
-        --input: 240 4% 16%;
-        --ring: 43 74% 52%;
-        --chart-1: 6 64% 47%;
-        --chart-2: 43 74% 52%;
-        --chart-3: 215 28% 17%;
-        --chart-4: 215 16% 47%;
-        --chart-5: 214 32% 91%;
+        /* Clean Dark Theme */
+        --background: 220 20% 10%;
+        --foreground: 220 15% 90%;
+        --card: 220 20% 13%;
+        --card-foreground: 220 15% 90%;
+        --popover: 220 20% 13%;
+        --popover-foreground: 220 15% 90%;
+        --primary: 220 70% 60%;
+        --primary-foreground: 220 20% 10%;
+        --secondary: 220 15% 20%;
+        --secondary-foreground: 220 15% 85%;
+        --accent: 220 70% 60%;
+        --accent-foreground: 220 20% 10%;
+        --muted: 220 15% 20%;
+        --muted-foreground: 220 10% 55%;
+        --border: 220 15% 22%;
+        --input: 220 15% 22%;
+        --ring: 220 70% 60%;
     }
 }
 
@@ -65,58 +60,41 @@
     }
     body {
         @apply bg-background text-foreground font-sans antialiased;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     }
     h1, h2, h3, h4, h5, h6 {
-        @apply font-serif;
+        @apply font-serif tracking-tight;
     }
 }
 
 /* Font Families */
 .font-serif {
-    font-family: 'Libre Baskerville', serif;
+    font-family: 'Source Serif 4', serif;
 }
 
 .font-sans {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
 }
 
-.font-mono {
-    font-family: 'JetBrains Mono', monospace;
-}
-
-/* Custom Scrollbar */
+/* Custom Scrollbar - Minimal */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-muted;
+    @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-none;
+    @apply bg-border rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    @apply bg-muted-foreground/40;
 }
 
-/* Grain texture overlay */
-.grain-overlay::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Animation utilities */
+/* Smooth animations */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -125,7 +103,18 @@
 @keyframes slideUp {
     from { 
         opacity: 0; 
-        transform: translateY(20px); 
+        transform: translateY(12px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-8px); 
     }
     to { 
         opacity: 1; 
@@ -134,14 +123,55 @@
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.3s ease-out forwards;
+    animation: fadeIn 0.25s ease-out forwards;
 }
 
 .animate-slide-up {
-    animation: slideUp 0.4s ease-out forwards;
+    animation: slideUp 0.35s ease-out forwards;
 }
 
-/* Debug wrapper */
+.animate-slide-down {
+    animation: slideDown 0.25s ease-out forwards;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+    animation: slideUp 0.35s ease-out forwards;
+    opacity: 0;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+
+/* Focus styles */
+*:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+}
+
+/* Selection color */
+::selection {
+    @apply bg-primary/20 text-foreground;
+}
+
+/* Smooth page transitions */
+.page-transition {
+    @apply transition-all duration-300 ease-out;
+}
+
+/* Card hover effects */
+.card-hover {
+    @apply transition-all duration-200 ease-out hover:shadow-lg hover:-translate-y-0.5;
+}
+
+/* Input focus glow */
+input:focus, textarea:focus, select:focus {
+    @apply ring-2 ring-primary/20;
+}
+
+/* Debug wrapper fix */
 @layer base {
     [data-debug-wrapper="true"] {
         display: contents !important;
