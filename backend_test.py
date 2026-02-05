@@ -499,12 +499,12 @@ class JudicialInstitutionsAPITester:
         return success
 
 def main():
-    print("🚀 Starting Public Search API Tests")
+    print("🚀 Starting Judicial Institutions API Tests")
     print("=" * 50)
     
-    tester = PublicSearchAPITester()
+    tester = JudicialInstitutionsAPITester()
     
-    # Test sequence - focusing on public search functionality
+    # Test sequence - focusing on institutions and public search functionality
     tests = [
         ("Health Check", tester.test_health_check),
         ("Get Institutions (PUBLIC)", tester.test_get_institutii),
