@@ -176,7 +176,18 @@ def call_soap_cautare_dosare(numar_dosar=None, obiect_dosar=None, nume_parte=Non
             return []
         
         # Serialize zeep objects to dict
-        return serialize_object(result)
+        serialized = serialize_object(result)
+        
+        # Ensure we always return a list
+        if serialized is None:
+            return []
+        if isinstance(serialized, str):
+            return []
+        if isinstance(serialized, dict):
+            return [serialized]
+        if isinstance(serialized, list):
+            return [item for item in serialized if isinstance(item, dict)]
+        return []
     except Exception as e:
         logging.error(f"SOAP CautareDosare error: {e}")
         return []
