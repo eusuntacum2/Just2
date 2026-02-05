@@ -12,7 +12,7 @@ class PublicSearchAPITester:
         self.tests_passed = 0
         self.admin_token = None
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, use_auth=True):
         """Run a single API test"""
         url = f"{self.base_url}/api/{endpoint}"
         test_headers = {'Content-Type': 'application/json'}
@@ -20,12 +20,14 @@ class PublicSearchAPITester:
         if headers:
             test_headers.update(headers)
         
-        if self.token and not headers:
+        # Only add auth if explicitly requested and token exists
+        if use_auth and self.token and not headers:
             test_headers['Authorization'] = f'Bearer {self.token}'
 
         self.tests_run += 1
         print(f"\n🔍 Testing {name}...")
         print(f"   URL: {url}")
+        print(f"   Auth: {'Yes' if use_auth and self.token else 'No'}")
         
         try:
             if method == 'GET':
