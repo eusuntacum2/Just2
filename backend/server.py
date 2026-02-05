@@ -893,17 +893,16 @@ def process_dosar_to_row(dosar: dict, search_term: str, search_type: str) -> dic
     # For "Număr dosar" search, Nume Parte and Calitate stay empty (as per requirement)
     
     return row
-    
-    return rows
 
 @api_router.post("/dosare/search/universal")
 async def universal_search(request: UniversalSearchRequest):
     """
     Universal search with diacritic-insensitive matching.
     Auto-detects search type (case number vs party name).
-    Returns structured table rows.
+    Returns ONE row per case (not per party).
     """
     all_rows = []
+    seen_cases = set()  # Avoid duplicates
     
     for term in request.termeni[:50]:  # Limit to 50 terms
         term = term.strip()
@@ -914,19 +913,21 @@ async def universal_search(request: UniversalSearchRequest):
         
         try:
             if search_type == "Număr dosar":
-                # Search by case number
                 results = await async_cautare_dosare(numar_dosar=term)
             else:
-                # Search by party name (diacritic-insensitive handled by API)
                 results = await async_cautare_dosare(nume_parte=term)
             
             if results:
                 for dosar in results:
                     if dosar and isinstance(dosar, dict):
-                        rows = process_dosar_to_rows(dosar, term, search_type)
-                        all_rows.extend(rows)
+                        case_key = f"{term}|{dosar.get('numar', '')}"
+                        if case_key not in seen_cases:
+                            seen_cases.add(case_key)
+                            row = process_dosar_to_row(dosar, term, search_type)
+                            if row:
+                                all_rows.append(row)
             else:
-                # No results - add empty row
+                # No results - add row with Observații message
                 all_rows.append({
                     "termen_cautare": term,
                     "tip_detectat": search_type,
@@ -937,8 +938,9 @@ async def universal_search(request: UniversalSearchRequest):
                     "data": "",
                     "ultima_modificare": "",
                     "categorie_caz": "",
-                    "nume_parte": "Niciun rezultat găsit",
-                    "calitate_parte": ""
+                    "nume_parte": "",
+                    "calitate_parte": "",
+                    "observatii": "Niciun rezultat găsit"
                 })
         except Exception as e:
             logging.error(f"Search error for term '{term}': {e}")
@@ -948,6 +950,14 @@ async def universal_search(request: UniversalSearchRequest):
                 "numar_dosar": "",
                 "instanta": "",
                 "obiect": "",
+                "stadiu_procesual": "",
+                "data": "",
+                "ultima_modificare": "",
+                "categorie_caz": "",
+                "nume_parte": "",
+                "calitate_parte": "",
+                "observatii": f"Eroare: {str(e)[:50]}"
+            })
                 "stadiu_procesual": "",
                 "data": "",
                 "ultima_modificare": "",
