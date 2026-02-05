@@ -211,7 +211,7 @@ const SearchPage = () => {
                                         <Label>Instituție</Label>
                                         <Select
                                             value={singleForm.institutie}
-                                            onValueChange={(value) => setSingleForm({ ...singleForm, institutie: value })}
+                                            onValueChange={(value) => setSingleForm({ ...singleForm, institutie: value === "all" ? "" : value })}
                                         >
                                             <SelectTrigger className="h-12" data-testid="select-institutie">
                                                 <SelectValue placeholder="Selectează instituția" />
