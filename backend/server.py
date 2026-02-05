@@ -395,16 +395,19 @@ async def search_dosare(request: CautareDosarRequest):
         return {"error": f"Eroare la căutare: {str(e)}"}
 
 @api_router.post("/dosare/search/bulk")
-async def search_dosare_bulk(request: BulkSearchRequest, user: dict = Depends(get_current_user)):
-    """Bulk search for cases"""
+async def search_dosare_bulk(request: BulkSearchRequest):
+    """Bulk search for cases - PUBLIC (no auth required)"""
+    if not request.numere_dosare:
+        return {"error": "Lista de numere dosare este goală"}
+    
     results = []
     errors = []
     
-    for numar in request.numere_dosare:
+    for numar in request.numere_dosare[:50]:  # Limit to 50
         try:
             dosar_results = await async_cautare_dosare(
                 numar_dosar=numar.strip(),
-                institutie=request.institutie
+                institutie=request.institutie if request.institutie else None
             )
             if dosar_results:
                 for dosar in dosar_results:
@@ -413,11 +416,31 @@ async def search_dosare_bulk(request: BulkSearchRequest, user: dict = Depends(ge
                         processed["searched_number"] = numar
                         results.append(processed)
             else:
-                errors.append({"numar": numar, "error": "Not found"})
+                errors.append({"numar": numar, "error": "Negăsit"})
         except Exception as e:
             errors.append({"numar": numar, "error": str(e)})
     
-    return {"results": results, "count": len(results), "errors": errors}
+    # Sort by data descending
+    results.sort(key=lambda x: x.get("data", "") or "", reverse=True)
+    
+    # Pagination
+    total_count = len(results)
+    page = max(1, request.page)
+    page_size = min(max(1, request.page_size), 20)
+    total_pages = max(1, (total_count + page_size - 1) // page_size)
+    
+    start_idx = (page - 1) * page_size
+    end_idx = start_idx + page_size
+    paginated_results = results[start_idx:end_idx]
+    
+    return {
+        "results": paginated_results,
+        "total_count": total_count,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages,
+        "errors": errors
+    }
 
 @api_router.post("/dosare/search/csv")
 async def search_dosare_csv(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
