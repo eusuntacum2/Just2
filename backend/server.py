@@ -796,7 +796,289 @@ async def search_dosare_csv(file: UploadFile = File(...)):
         "total_searched": len(numere)
     }
 
-def process_dosar(dosar) -> dict:
+# ============== UNIVERSAL SEARCH (DIACRITIC-INSENSITIVE) ==============
+
+def process_dosar_to_rows(dosar: dict, search_term: str, search_type: str) -> List[dict]:
+    """Convert a dosar to table rows - one row per party"""
+    if not dosar or not isinstance(dosar, dict):
+        return []
+    
+    rows = []
+    instanta_key = dosar.get("institutie", "")
+    instanta_name = INSTITUTII_MAP.get(str(instanta_key), str(instanta_key))
+    
+    # Parse dates
+    data_str = ""
+    if dosar.get("data"):
+        try:
+            d = str(dosar.get("data", ""))
+            if 'T' in d:
+                data_str = d.split('T')[0]
+            elif d:
+                data_str = d[:10]
+        except:
+            data_str = ""
+    
+    # Get ultima modificare from sedinte
+    ultima_modificare = ""
+    sedinte_raw = dosar.get("sedinte")
+    if sedinte_raw:
+        if isinstance(sedinte_raw, dict) and "DosarSedinta" in sedinte_raw:
+            sedinte_list = sedinte_raw.get("DosarSedinta", [])
+        elif isinstance(sedinte_raw, list):
+            sedinte_list = sedinte_raw
+        else:
+            sedinte_list = []
+        
+        if sedinte_list:
+            # Get most recent sedinta date
+            dates = []
+            for s in sedinte_list:
+                if isinstance(s, dict) and s.get("data"):
+                    d = str(s.get("data", ""))
+                    if 'T' in d:
+                        dates.append(d.split('T')[0])
+                    elif d:
+                        dates.append(d[:10])
+            if dates:
+                dates.sort(reverse=True)
+                ultima_modificare = dates[0]
+    
+    # Base row data
+    base_row = {
+        "termen_cautare": search_term,
+        "tip_detectat": search_type,
+        "numar_dosar": dosar.get("numar", ""),
+        "instanta": instanta_name,
+        "obiect": dosar.get("obiect", ""),
+        "stadiu_procesual": str(dosar.get("stadiuProcesual", "")),
+        "data": data_str,
+        "ultima_modificare": ultima_modificare,
+        "categorie_caz": str(dosar.get("categorieCaz", "")),
+        "nume_parte": "",
+        "calitate_parte": ""
+    }
+    
+    # Process parties
+    parti_raw = dosar.get("parti")
+    parti_list = []
+    if parti_raw:
+        if isinstance(parti_raw, dict) and "DosarParte" in parti_raw:
+            parti_list = parti_raw.get("DosarParte", [])
+        elif isinstance(parti_raw, list):
+            parti_list = parti_raw
+    
+    if parti_list:
+        for parte in parti_list:
+            if isinstance(parte, dict):
+                row = base_row.copy()
+                row["nume_parte"] = parte.get("nume", "")
+                row["calitate_parte"] = parte.get("calitateParte", "")
+                rows.append(row)
+    else:
+        # No parties - still add one row
+        rows.append(base_row)
+    
+    return rows
+
+@api_router.post("/dosare/search/universal")
+async def universal_search(request: UniversalSearchRequest):
+    """
+    Universal search with diacritic-insensitive matching.
+    Auto-detects search type (case number vs party name).
+    Returns structured table rows.
+    """
+    all_rows = []
+    
+    for term in request.termeni[:50]:  # Limit to 50 terms
+        term = term.strip()
+        if not term:
+            continue
+        
+        search_type = detect_search_type(term)
+        
+        try:
+            if search_type == "Număr dosar":
+                # Search by case number
+                results = await async_cautare_dosare(numar_dosar=term)
+            else:
+                # Search by party name (diacritic-insensitive handled by API)
+                results = await async_cautare_dosare(nume_parte=term)
+            
+            if results:
+                for dosar in results:
+                    if dosar and isinstance(dosar, dict):
+                        rows = process_dosar_to_rows(dosar, term, search_type)
+                        all_rows.extend(rows)
+            else:
+                # No results - add empty row
+                all_rows.append({
+                    "termen_cautare": term,
+                    "tip_detectat": search_type,
+                    "numar_dosar": "",
+                    "instanta": "",
+                    "obiect": "",
+                    "stadiu_procesual": "",
+                    "data": "",
+                    "ultima_modificare": "",
+                    "categorie_caz": "",
+                    "nume_parte": "Niciun rezultat găsit",
+                    "calitate_parte": ""
+                })
+        except Exception as e:
+            logging.error(f"Search error for term '{term}': {e}")
+            all_rows.append({
+                "termen_cautare": term,
+                "tip_detectat": search_type,
+                "numar_dosar": "",
+                "instanta": "",
+                "obiect": "",
+                "stadiu_procesual": "",
+                "data": "",
+                "ultima_modificare": "",
+                "categorie_caz": "",
+                "nume_parte": f"Eroare: {str(e)[:50]}",
+                "calitate_parte": ""
+            })
+    
+    # Pagination
+    total_count = len(all_rows)
+    page = max(1, request.page)
+    page_size = min(max(1, request.page_size), 100)
+    total_pages = max(1, (total_count + page_size - 1) // page_size)
+    
+    start_idx = (page - 1) * page_size
+    end_idx = start_idx + page_size
+    paginated_rows = all_rows[start_idx:end_idx]
+    
+    return {
+        "rows": paginated_rows,
+        "total_count": total_count,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages,
+        "headers": [
+            "Termen Căutare", "Tip Detectat", "Număr Dosar", "Instanță",
+            "Obiect", "Stadiu Procesual", "Data", "Ultima Modificare",
+            "Categorie Caz", "Nume Parte", "Calitate parte"
+        ]
+    }
+
+# ============== EXPORT ENDPOINTS ==============
+
+EXPORT_HEADERS = [
+    "Termen Căutare", "Tip Detectat", "Număr Dosar", "Instanță",
+    "Obiect", "Stadiu Procesual", "Data", "Ultima Modificare",
+    "Categorie Caz", "Nume Parte", "Calitate parte"
+]
+
+EXPORT_FIELDS = [
+    "termen_cautare", "tip_detectat", "numar_dosar", "instanta",
+    "obiect", "stadiu_procesual", "data", "ultima_modificare",
+    "categorie_caz", "nume_parte", "calitate_parte"
+]
+
+@api_router.post("/dosare/export/xlsx")
+async def export_xlsx(request: UniversalSearchRequest):
+    """Export search results as Excel (.xlsx) - UTF-8"""
+    # Get all results (no pagination for export)
+    search_result = await universal_search(UniversalSearchRequest(
+        termeni=request.termeni, page=1, page_size=10000
+    ))
+    rows = search_result["rows"]
+    
+    # Create Excel file in memory
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    worksheet = workbook.add_worksheet('Rezultate')
+    
+    # Header format
+    header_format = workbook.add_format({
+        'bold': True,
+        'bg_color': '#4472C4',
+        'font_color': 'white',
+        'border': 1
+    })
+    
+    # Write headers
+    for col, header in enumerate(EXPORT_HEADERS):
+        worksheet.write(0, col, header, header_format)
+        worksheet.set_column(col, col, 20)
+    
+    # Write data
+    cell_format = workbook.add_format({'border': 1})
+    for row_idx, row in enumerate(rows, start=1):
+        for col_idx, field in enumerate(EXPORT_FIELDS):
+            worksheet.write(row_idx, col_idx, row.get(field, ""), cell_format)
+    
+    workbook.close()
+    output.seek(0)
+    
+    filename = f"dosare_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+@api_router.post("/dosare/export/csv")
+async def export_csv(request: UniversalSearchRequest):
+    """Export search results as CSV - UTF-8 with BOM"""
+    search_result = await universal_search(UniversalSearchRequest(
+        termeni=request.termeni, page=1, page_size=10000
+    ))
+    rows = search_result["rows"]
+    
+    output = io.StringIO()
+    # Add UTF-8 BOM for Excel compatibility
+    output.write('\ufeff')
+    
+    writer = csv.writer(output, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(EXPORT_HEADERS)
+    
+    for row in rows:
+        writer.writerow([row.get(field, "") for field in EXPORT_FIELDS])
+    
+    content = output.getvalue()
+    filename = f"dosare_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    
+    return StreamingResponse(
+        io.BytesIO(content.encode('utf-8')),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+@api_router.post("/dosare/export/txt")
+async def export_txt(request: UniversalSearchRequest):
+    """Export search results as TXT - Tab-separated, UTF-8"""
+    search_result = await universal_search(UniversalSearchRequest(
+        termeni=request.termeni, page=1, page_size=10000
+    ))
+    rows = search_result["rows"]
+    
+    output = io.StringIO()
+    # Add UTF-8 BOM
+    output.write('\ufeff')
+    
+    # Header
+    output.write('\t'.join(EXPORT_HEADERS) + '\n')
+    
+    # Data
+    for row in rows:
+        values = [str(row.get(field, "")).replace('\t', ' ').replace('\n', ' ') for field in EXPORT_FIELDS]
+        output.write('\t'.join(values) + '\n')
+    
+    content = output.getvalue()
+    filename = f"dosare_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    
+    return StreamingResponse(
+        io.BytesIO(content.encode('utf-8')),
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+# ============== PROCESS DOSAR ==============
     """Process a case to ensure proper serialization"""
     if not dosar:
         return {}
