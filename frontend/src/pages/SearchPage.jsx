@@ -93,7 +93,7 @@ const SearchPage = () => {
         try {
             const response = await api.post('/dosare/search/bulk', {
                 numere_dosare: numere,
-                institutie: bulkInstitutie || null
+                institutie: bulkInstitutie === 'all' ? null : (bulkInstitutie || null)
             });
             setResults(response.data.results);
             setErrors(response.data.errors || []);
