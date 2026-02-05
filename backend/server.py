@@ -481,11 +481,22 @@ async def search_dosare_csv(file: UploadFile = File(...)):
                         processed["searched_number"] = numar
                         results.append(processed)
             else:
-                errors.append({"numar": numar, "error": "Not found"})
+                errors.append({"numar": numar, "error": "Negăsit"})
         except Exception as e:
             errors.append({"numar": numar, "error": str(e)})
     
-    return {"results": results, "count": len(results), "errors": errors, "total_searched": len(numere)}
+    # Sort by data descending
+    results.sort(key=lambda x: x.get("data", "") or "", reverse=True)
+    
+    return {
+        "results": results,
+        "total_count": len(results),
+        "page": 1,
+        "page_size": len(results),
+        "total_pages": 1,
+        "errors": errors,
+        "total_searched": len(numere)
+    }
 
 def process_dosar(dosar: dict) -> dict:
     """Process a case to ensure proper serialization"""
