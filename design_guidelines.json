@@ -1,0 +1,196 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Creative Designer",
+    "principles": [
+      "Fusion over Imitation: Mix Legal Brutalism with Fintech Precision.",
+      "Emotion First: Trust, Authority, and Efficiency.",
+      "Content is King: Every pixel serves the case data.",
+      "Zoom In: Focus on critical case details.",
+      "Negative Space: Give the law room to breathe.",
+      "Contrast: High contrast for readability and impact."
+    ],
+    "anti_patterns": [
+      "No generic 'SaaS Blue'.",
+      "No 'Inter' for headings.",
+      "No center-aligned everything.",
+      "No gradient overload."
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "headings": {
+        "family": "Libre Baskerville",
+        "type": "Serif",
+        "weights": ["400", "700"],
+        "usage": "Headings, Hero Titles, Section Headers",
+        "url": "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"
+      },
+      "body": {
+        "family": "DM Sans",
+        "type": "Sans-serif",
+        "weights": ["400", "500", "700"],
+        "usage": "Body text, UI elements, Buttons, Inputs",
+        "url": "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap"
+      },
+      "mono": {
+        "family": "JetBrains Mono",
+        "type": "Monospace",
+        "weights": ["400"],
+        "usage": "Case Numbers, Dates, IDs",
+        "url": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap"
+      }
+    },
+    "rules": [
+      "Headings > 32px must use tracking-tight.",
+      "Overlines must be Uppercase + tracking-widest.",
+      "Line height: leading-none for headers, leading-relaxed for body."
+    ]
+  },
+  "colors": {
+    "theme_strategy": "Dual Persona",
+    "light_mode": {
+      "name": "Paper & Ink",
+      "background": "#F9F9F7",
+      "foreground": "#1E293B",
+      "card": "#FFFFFF",
+      "card_foreground": "#1E293B",
+      "primary": "#1E293B",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#E2E8F0",
+      "secondary_foreground": "#1E293B",
+      "accent": "#C63D2F",
+      "accent_foreground": "#FFFFFF",
+      "muted": "#F1F5F9",
+      "muted_foreground": "#64748B",
+      "border": "#E2E8F0",
+      "input": "#E2E8F0",
+      "ring": "#1E293B"
+    },
+    "dark_mode": {
+      "name": "Obsidian & Gold",
+      "background": "#0A0A0A",
+      "foreground": "#E2E8F0",
+      "card": "#121212",
+      "card_foreground": "#E2E8F0",
+      "primary": "#D4AF37",
+      "primary_foreground": "#0A0A0A",
+      "secondary": "#27272A",
+      "secondary_foreground": "#E2E8F0",
+      "accent": "#D4AF37",
+      "accent_foreground": "#0A0A0A",
+      "muted": "#27272A",
+      "muted_foreground": "#A1A1AA",
+      "border": "#27272A",
+      "input": "#27272A",
+      "ring": "#D4AF37"
+    },
+    "chart_colors": [
+      "#C63D2F",
+      "#D4AF37",
+      "#1E293B",
+      "#64748B",
+      "#E2E8F0"
+    ]
+  },
+  "layout": {
+    "spacing_scale": [
+      "p-1", "p-2", "p-4", "p-6", "p-8", "p-12", "p-16", "p-20", "p-24", "p-32"
+    ],
+    "container_padding": "px-6 md:px-12 lg:px-24",
+    "border_radius": "rounded-none",
+    "grids": {
+      "marketing": {
+        "name": "Tetris Grid",
+        "classes": "grid grid-cols-1 md:grid-cols-12 gap-8",
+        "rules": "Asymmetry is key. Use col-span-8 for hero, col-span-4 for support."
+      },
+      "dashboard": {
+        "name": "Bento Density",
+        "classes": "grid grid-cols-1 md:grid-cols-4 gap-4",
+        "rules": "Dense packing. No gaps. Use h-full to stretch."
+      }
+    }
+  },
+  "components": {
+    "buttons": {
+      "style": "Sharp edges (rounded-none) or Pill (rounded-full).",
+      "interaction": "Hover: lift (-translate-y-0.5) + shadow-lg.",
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90",
+      "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      "outline": "border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+    },
+    "cards": {
+      "style": "Flat, 1px border, no shadow (default). Hover: shadow-md.",
+      "dashboard": "bg-card border-border border",
+      "marketing": "Glassmorphism or Tracing Beam effect."
+    },
+    "inputs": {
+      "style": "bg-input/50 border-transparent focus:border-primary focus:ring-0 rounded-none",
+      "height": "h-12"
+    },
+    "navigation": {
+      "style": "Sticky, Glassmorphism (backdrop-blur-xl).",
+      "border": "border-b border-border/40"
+    }
+  },
+  "visual_enhancers": {
+    "textures": "Use subtle grain/noise overlay on backgrounds to reduce digital flatness.",
+    "shadows": "Layered shadows: shadow-sm + shadow-xl for depth.",
+    "glassmorphism": "backdrop-blur-xl bg-background/70 border-white/10",
+    "gradients": "NO full-screen gradients. Use subtle mesh gradients in hero backgrounds only."
+  },
+  "images": {
+    "hero_bg": {
+      "url": "https://images.unsplash.com/photo-1643324896137-f0928e76202a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzl8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGp1c3RpY2UlMjBzY2FsZXMlMjBnb2xkJTIwYW5kJTIwYmxhY2t8ZW58MHx8fHwxNzcwMzA1NTM5fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract Justice Gold and Black",
+      "usage": "Hero section background with overlay"
+    },
+    "office_interior": {
+      "url": "https://images.unsplash.com/photo-1571055931484-22dce9d6c510?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzR8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBsYXclMjBvZmZpY2UlMjBpbnRlcmlvciUyMG1pbmltYWxpc3R8ZW58MHx8fHwxNzcwMzA1NTM4fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Modern Minimalist Law Office",
+      "usage": "About section or Features background"
+    },
+    "lawyer_working": {
+      "url": "https://images.unsplash.com/photo-1545184180-25d471fe75eb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwzfHxsYXd5ZXIlMjB3b3JraW5nJTIwb24lMjBsYXB0b3AlMjBjb2ZmZWUlMjBzaG9wfGVufDB8fHx8MTc3MDMwNTU0NXww&ixlib=rb-4.1.0&q=85",
+      "alt": "Lawyer working on laptop",
+      "usage": "Testimonials or 'For Lawyers' section"
+    }
+  },
+  "motion": {
+    "transitions": "transition-all duration-300 ease-out",
+    "hover_effects": "scale-[1.02] active:scale-[0.98]",
+    "page_load": "Fade in + Slide up (framer-motion)",
+    "scroll": "Parallax for hero images"
+  },
+  "accessibility": {
+    "contrast": "Ensure 4.5:1 for normal text, 3:1 for large text.",
+    "focus_states": "Visible focus ring (ring-2 ring-offset-2 ring-primary).",
+    "reduced_motion": "Respect prefers-reduced-motion media query."
+  },
+  "tech_stack": {
+    "framework": "React",
+    "styling": "Tailwind CSS",
+    "components": "shadcn/ui",
+    "icons": "lucide-react",
+    "charts": "recharts (via shadcn/chart)"
+  },
+  "instructions_to_main_agent": [
+    "Implement the 'Paper & Ink' (Light) and 'Obsidian & Gold' (Dark) themes in tailwind.config.js.",
+    "Install fonts: Libre Baskerville (Headings), DM Sans (Body), JetBrains Mono (Data).",
+    "Use the provided image URLs for the Landing Page.",
+    "Build the Dashboard using the 'Bento Density' grid layout.",
+    "Ensure all interactive elements have data-testid attributes.",
+    "Do NOT use default Shadcn styles; customize borders to be sharp (rounded-none) or minimal.",
+    "Use 'sonner' for toast notifications.",
+    "Create a 'Layout' component that handles the Sidebar/Header structure for the Dashboard."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI slop' aesthetics (generic centered layouts, gradients).",
+    "Use z-index hierarchy for depth.",
+    "No universal 'transition: all'.",
+    "No center-aligned app container.",
+    "Use micro-animations for all interactions.",
+    "Use named exports for components, default exports for pages."
+  ]
+}
