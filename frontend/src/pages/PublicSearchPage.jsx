@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { Card, CardContent } from '../components/ui/card';
 import { Textarea } from '../components/ui/textarea';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { ScrollArea, ScrollBar } from '../components/ui/scroll-area';
+import { Label } from '../components/ui/label';
 import { 
-    Search, Loader2, Scale, Sun, Moon, LogIn, Download,
+    Search, Loader2, Scale, Sun, Moon, LogIn, 
     FileSpreadsheet, FileText, FileDown, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -19,17 +16,18 @@ import axios from 'axios';
 const API_URL = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const TABLE_HEADERS = [
-    "Termen Căutare",
-    "Tip Detectat", 
-    "Număr Dosar",
-    "Instanță",
-    "Obiect",
-    "Stadiu Procesual",
-    "Data",
-    "Ultima Modificare",
-    "Categorie Caz",
-    "Nume Parte",
-    "Calitate parte"
+    { key: "termen_cautare", label: "Termen", width: "w-24" },
+    { key: "tip_detectat", label: "Tip", width: "w-20" },
+    { key: "numar_dosar", label: "Nr. Dosar", width: "w-28" },
+    { key: "instanta", label: "Instanță", width: "w-32" },
+    { key: "obiect", label: "Obiect", width: "w-40" },
+    { key: "stadiu_procesual", label: "Stadiu", width: "w-20" },
+    { key: "data", label: "Data", width: "w-24" },
+    { key: "ultima_modificare", label: "Modif.", width: "w-24" },
+    { key: "categorie_caz", label: "Categorie", width: "w-24" },
+    { key: "nume_parte", label: "Parte", width: "w-32" },
+    { key: "calitate_parte", label: "Calitate", width: "w-24" },
+    { key: "observatii", label: "Observații", width: "w-32" }
 ];
 
 const PublicSearchPage = () => {
@@ -81,7 +79,7 @@ const PublicSearchPage = () => {
             if (response.data.total_count === 0) {
                 toast.info('Nu s-au găsit rezultate');
             } else {
-                toast.success(`${response.data.total_count} rezultat(e) găsite`);
+                toast.success(`${response.data.total_count} dosar(e) găsit(e)`);
             }
         } catch (error) {
             toast.error(error.response?.data?.error || 'Căutare eșuată');
@@ -107,7 +105,6 @@ const PublicSearchPage = () => {
                 { responseType: 'blob' }
             );
             
-            // Create download link
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -141,7 +138,7 @@ const PublicSearchPage = () => {
 
     const addToMonitoring = async (numarDosar, instanta) => {
         if (!isAuthenticated) {
-            toast.error('Trebuie să fii autentificat pentru a monitoriza dosare');
+            toast.error('Autentifică-te pentru a monitoriza dosare');
             navigate('/login');
             return;
         }
@@ -162,236 +159,230 @@ const PublicSearchPage = () => {
         <div className="min-h-screen bg-background" data-testid="public-search-page">
             {/* Navigation */}
             <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-3" data-testid="logo-link">
-                        <Scale className="h-7 w-7 text-primary" />
-                        <span className="font-serif text-xl font-semibold">Portal Dosare</span>
+                <div className="max-w-full mx-auto px-4 py-3 flex items-center justify-between">
+                    <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
+                        <Scale className="h-6 w-6 text-primary" />
+                        <span className="font-serif text-lg font-semibold">Portal Dosare</span>
                     </Link>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={toggleTheme}
-                            className="rounded-full"
+                            className="rounded-full h-8 w-8"
                             data-testid="theme-toggle"
                         >
-                            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                         </Button>
                         {isAuthenticated ? (
-                            <Button onClick={() => navigate('/dashboard')} data-testid="dashboard-btn">
+                            <Button size="sm" onClick={() => navigate('/dashboard')} data-testid="dashboard-btn">
                                 Dashboard
                             </Button>
                         ) : (
-                            <Button onClick={() => navigate('/login')} data-testid="login-btn">
-                                <LogIn className="mr-2 h-4 w-4" />
-                                Autentificare
+                            <Button size="sm" onClick={() => navigate('/login')} data-testid="login-btn">
+                                <LogIn className="mr-1 h-4 w-4" />
+                                Login
                             </Button>
                         )}
                     </div>
                 </div>
             </nav>
 
-            <div className="max-w-7xl mx-auto px-6 py-12 space-y-8">
+            <div className="max-w-full mx-auto px-4 py-6 space-y-6">
                 {/* Header */}
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                        Caută dosare
+                <div className="text-center space-y-2">
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+                        Căutare Dosare
                     </h1>
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Căutare universală după număr dosar sau nume parte. 
-                        Suportă căutare cu sau fără diacritice (ex: Iasi = IAȘI).
+                    <p className="text-sm text-muted-foreground">
+                        Căutare după număr dosar sau nume parte • Suportă diacritice (Iasi = IAȘI)
                     </p>
                 </div>
 
                 {/* Search Form */}
-                <Card className="border-border/50 shadow-sm">
-                    <CardContent className="p-8 space-y-6">
+                <Card className="border-border/50">
+                    <CardContent className="p-4 space-y-4">
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">
                                 Termeni de căutare (unul pe linie)
                             </Label>
-                            <p className="text-xs text-muted-foreground">
-                                Introduceți numere de dosar (ex: 123/45/2024) sau nume părți (ex: Popescu Ion)
-                            </p>
                             <Textarea
-                                placeholder={"8893/99/2009\nPopescu Ion\n456/78/2024"}
+                                placeholder={"8893/99/2009\nPopescu Ion"}
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
-                                className="min-h-[150px] font-mono text-base"
+                                className="min-h-[100px] font-mono text-sm"
                                 data-testid="search-textarea"
                             />
                         </div>
                         
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap gap-2 items-center">
                             <Button 
                                 onClick={() => handleSearch(1)}
-                                size="lg"
-                                className="h-12 px-8"
                                 disabled={loading}
                                 data-testid="search-btn"
                             >
                                 {loading ? (
                                     <>
-                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         Se caută...
                                     </>
                                 ) : (
                                     <>
-                                        <Search className="mr-2 h-5 w-5" />
+                                        <Search className="mr-2 h-4 w-4" />
                                         Caută
                                     </>
                                 )}
                             </Button>
 
-                            {/* Export Buttons */}
-                            <div className="flex gap-2 ml-auto">
+                            <div className="flex gap-1 ml-auto">
                                 <Button
                                     variant="outline"
+                                    size="sm"
                                     onClick={() => handleExport('xlsx')}
                                     disabled={exporting !== null || searchText.trim() === ''}
                                     data-testid="export-xlsx-btn"
                                 >
                                     {exporting === 'xlsx' ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Loader2 className="h-4 w-4 animate-spin" />
                                     ) : (
-                                        <FileSpreadsheet className="mr-2 h-4 w-4" />
+                                        <FileSpreadsheet className="h-4 w-4" />
                                     )}
-                                    Excel
+                                    <span className="ml-1 hidden sm:inline">Excel</span>
                                 </Button>
                                 <Button
                                     variant="outline"
+                                    size="sm"
                                     onClick={() => handleExport('csv')}
                                     disabled={exporting !== null || searchText.trim() === ''}
                                     data-testid="export-csv-btn"
                                 >
                                     {exporting === 'csv' ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Loader2 className="h-4 w-4 animate-spin" />
                                     ) : (
-                                        <FileText className="mr-2 h-4 w-4" />
+                                        <FileText className="h-4 w-4" />
                                     )}
-                                    CSV
+                                    <span className="ml-1 hidden sm:inline">CSV</span>
                                 </Button>
                                 <Button
                                     variant="outline"
+                                    size="sm"
                                     onClick={() => handleExport('txt')}
                                     disabled={exporting !== null || searchText.trim() === ''}
                                     data-testid="export-txt-btn"
                                 >
                                     {exporting === 'txt' ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Loader2 className="h-4 w-4 animate-spin" />
                                     ) : (
-                                        <FileDown className="mr-2 h-4 w-4" />
+                                        <FileDown className="h-4 w-4" />
                                     )}
-                                    TXT
+                                    <span className="ml-1 hidden sm:inline">TXT</span>
                                 </Button>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Results Table */}
+                {/* Results Table - Compact, no horizontal scroll */}
                 {rows.length > 0 && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-semibold">
+                            <h2 className="text-lg font-semibold">
                                 Rezultate
-                                <span className="text-muted-foreground font-normal ml-2">
-                                    ({pagination.total_count} rânduri)
+                                <span className="text-muted-foreground font-normal ml-2 text-sm">
+                                    ({pagination.total_count} dosar{pagination.total_count !== 1 ? 'e' : ''})
                                 </span>
                             </h2>
-                            <p className="text-sm text-muted-foreground">
-                                Pagina {pagination.page} din {pagination.total_pages}
+                            <p className="text-xs text-muted-foreground">
+                                Pag. {pagination.page}/{pagination.total_pages}
                             </p>
                         </div>
 
-                        <Card className="border-border/50 overflow-hidden">
-                            <ScrollArea className="w-full">
-                                <div className="min-w-[1400px]">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow className="bg-muted/50">
-                                                {TABLE_HEADERS.map((header, idx) => (
-                                                    <TableHead 
-                                                        key={idx} 
-                                                        className="font-semibold whitespace-nowrap px-4 py-3"
+                        <div className="border rounded-lg overflow-hidden">
+                            <table className="w-full text-xs">
+                                <thead className="bg-muted/50">
+                                    <tr>
+                                        {TABLE_HEADERS.map((header) => (
+                                            <th 
+                                                key={header.key}
+                                                className="px-2 py-2 text-left font-semibold whitespace-nowrap border-b"
+                                            >
+                                                {header.label}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {rows.map((row, rowIdx) => (
+                                        <tr 
+                                            key={rowIdx}
+                                            className="hover:bg-muted/30 border-b last:border-b-0"
+                                            data-testid={`result-row-${rowIdx}`}
+                                        >
+                                            <td className="px-2 py-2 font-mono truncate max-w-[100px]" title={row.termen_cautare}>
+                                                {row.termen_cautare}
+                                            </td>
+                                            <td className="px-2 py-2">
+                                                <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                                    row.tip_detectat === 'Număr dosar' 
+                                                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                                        : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                                }`}>
+                                                    {row.tip_detectat === 'Număr dosar' ? 'Dosar' : 'Parte'}
+                                                </span>
+                                            </td>
+                                            <td className="px-2 py-2 font-mono">
+                                                {row.numar_dosar && (
+                                                    <button
+                                                        onClick={() => addToMonitoring(row.numar_dosar, row.instanta)}
+                                                        className="text-primary hover:underline text-left"
+                                                        title="Click pentru monitorizare"
                                                     >
-                                                        {header}
-                                                    </TableHead>
-                                                ))}
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {rows.map((row, rowIdx) => (
-                                                <TableRow 
-                                                    key={rowIdx}
-                                                    className="hover:bg-muted/30"
-                                                    data-testid={`result-row-${rowIdx}`}
-                                                >
-                                                    <TableCell className="font-mono text-sm px-4 py-3">
-                                                        {row.termen_cautare}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-3">
-                                                        <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
-                                                            row.tip_detectat === 'Număr dosar' 
-                                                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                                                                : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                                                        }`}>
-                                                            {row.tip_detectat}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell className="font-mono text-sm px-4 py-3">
-                                                        {row.numar_dosar && (
-                                                            <button
-                                                                onClick={() => addToMonitoring(row.numar_dosar, row.instanta)}
-                                                                className="text-primary hover:underline cursor-pointer"
-                                                                title="Click pentru a monitoriza"
-                                                            >
-                                                                {row.numar_dosar}
-                                                            </button>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-3 max-w-[200px] truncate" title={row.instanta}>
-                                                        {row.instanta}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-3 max-w-[250px] truncate" title={row.obiect}>
-                                                        {row.obiect}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-3">
-                                                        {row.stadiu_procesual}
-                                                    </TableCell>
-                                                    <TableCell className="font-mono text-sm px-4 py-3 whitespace-nowrap">
-                                                        {row.data}
-                                                    </TableCell>
-                                                    <TableCell className="font-mono text-sm px-4 py-3 whitespace-nowrap">
-                                                        {row.ultima_modificare}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-3">
-                                                        {row.categorie_caz}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-3 max-w-[200px] truncate" title={row.nume_parte}>
-                                                        {row.nume_parte}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-3">
-                                                        {row.calitate_parte}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                                <ScrollBar orientation="horizontal" />
-                            </ScrollArea>
-                        </Card>
+                                                        {row.numar_dosar}
+                                                    </button>
+                                                )}
+                                            </td>
+                                            <td className="px-2 py-2 truncate max-w-[120px]" title={row.instanta}>
+                                                {row.instanta}
+                                            </td>
+                                            <td className="px-2 py-2 truncate max-w-[150px]" title={row.obiect}>
+                                                {row.obiect}
+                                            </td>
+                                            <td className="px-2 py-2 truncate max-w-[80px]" title={row.stadiu_procesual}>
+                                                {row.stadiu_procesual}
+                                            </td>
+                                            <td className="px-2 py-2 font-mono whitespace-nowrap">
+                                                {row.data}
+                                            </td>
+                                            <td className="px-2 py-2 font-mono whitespace-nowrap">
+                                                {row.ultima_modificare}
+                                            </td>
+                                            <td className="px-2 py-2 truncate max-w-[80px]" title={row.categorie_caz}>
+                                                {row.categorie_caz}
+                                            </td>
+                                            <td className="px-2 py-2 truncate max-w-[120px]" title={row.nume_parte}>
+                                                {row.nume_parte}
+                                            </td>
+                                            <td className="px-2 py-2 truncate max-w-[80px]" title={row.calitate_parte}>
+                                                {row.calitate_parte}
+                                            </td>
+                                            <td className="px-2 py-2 truncate max-w-[120px] text-muted-foreground italic" title={row.observatii}>
+                                                {row.observatii}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
                         {/* Pagination */}
                         {pagination.total_pages > 1 && (
-                            <div className="flex items-center justify-center gap-2 pt-4">
+                            <div className="flex items-center justify-center gap-1 pt-2">
                                 <Button
                                     variant="outline"
                                     size="icon"
+                                    className="h-8 w-8"
                                     onClick={() => goToPage(pagination.page - 1)}
                                     disabled={pagination.page <= 1}
-                                    data-testid="prev-page-btn"
                                 >
                                     <ChevronLeft className="h-4 w-4" />
                                 </Button>
@@ -414,6 +405,7 @@ const PublicSearchPage = () => {
                                                 key={pageNum}
                                                 variant={pagination.page === pageNum ? 'default' : 'outline'}
                                                 size="icon"
+                                                className="h-8 w-8"
                                                 onClick={() => goToPage(pageNum)}
                                             >
                                                 {pageNum}
@@ -425,9 +417,9 @@ const PublicSearchPage = () => {
                                 <Button
                                     variant="outline"
                                     size="icon"
+                                    className="h-8 w-8"
                                     onClick={() => goToPage(pagination.page + 1)}
                                     disabled={pagination.page >= pagination.total_pages}
-                                    data-testid="next-page-btn"
                                 >
                                     <ChevronRight className="h-4 w-4" />
                                 </Button>
@@ -438,15 +430,13 @@ const PublicSearchPage = () => {
 
                 {/* Empty State */}
                 {!loading && rows.length === 0 && (
-                    <div className="text-center py-16">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-6">
-                            <Search className="h-8 w-8 text-muted-foreground" />
+                    <div className="text-center py-12">
+                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+                            <Search className="h-7 w-7 text-muted-foreground" />
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">Caută dosare</h3>
-                        <p className="text-muted-foreground max-w-md mx-auto">
-                            Introduceți numere de dosar sau nume de părți pentru a căuta în toate instanțele din România.
-                            <br/>
-                            <span className="text-sm">Căutarea funcționează cu sau fără diacritice.</span>
+                        <h3 className="text-lg font-semibold mb-1">Caută dosare</h3>
+                        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                            Introdu numere de dosar (123/45/2024) sau nume părți pentru a căuta în instanțe.
                         </p>
                     </div>
                 )}
