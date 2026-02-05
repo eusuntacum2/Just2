@@ -338,29 +338,61 @@ async def get_institutii():
     return {"institutii": INSTITUTII}
 
 @api_router.post("/dosare/search")
-async def search_dosare(request: CautareDosarRequest, user: dict = Depends(get_current_user)):
-    """Search for cases using just.ro API"""
+async def search_dosare(request: CautareDosarRequest):
+    """Search for cases using just.ro API - PUBLIC (no auth required)"""
     try:
+        # Validate date format if provided
+        if request.data_start:
+            try:
+                datetime.fromisoformat(request.data_start)
+            except ValueError:
+                return {"error": "Format invalid pentru data_start. Folosiți YYYY-MM-DD"}
+        
+        if request.data_stop:
+            try:
+                datetime.fromisoformat(request.data_stop)
+            except ValueError:
+                return {"error": "Format invalid pentru data_stop. Folosiți YYYY-MM-DD"}
+        
         results = await async_cautare_dosare(
-            numar_dosar=request.numar_dosar,
-            obiect_dosar=request.obiect_dosar,
-            nume_parte=request.nume_parte,
-            institutie=request.institutie,
-            data_start=request.data_start,
-            data_stop=request.data_stop
+            numar_dosar=request.numar_dosar if request.numar_dosar else None,
+            obiect_dosar=request.obiect_dosar if request.obiect_dosar else None,
+            nume_parte=request.nume_parte if request.nume_parte else None,
+            institutie=request.institutie if request.institutie else None,
+            data_start=request.data_start if request.data_start else None,
+            data_stop=request.data_stop if request.data_stop else None
         )
         
-        # Process results to ensure serializable
+        # Process and sort results by date descending
         processed = []
         if results:
             for dosar in results:
                 if dosar:
                     processed.append(process_dosar(dosar))
         
-        return {"results": processed, "count": len(processed)}
+        # Sort by data descending (most recent first)
+        processed.sort(key=lambda x: x.get("data", "") or "", reverse=True)
+        
+        # Pagination
+        total_count = len(processed)
+        page = max(1, request.page)
+        page_size = min(max(1, request.page_size), 20)  # Max 20 per page
+        total_pages = max(1, (total_count + page_size - 1) // page_size)
+        
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        paginated_results = processed[start_idx:end_idx]
+        
+        return {
+            "results": paginated_results,
+            "total_count": total_count,
+            "page": page,
+            "page_size": page_size,
+            "total_pages": total_pages
+        }
     except Exception as e:
         logging.error(f"Search error: {e}")
-        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+        return {"error": f"Eroare la căutare: {str(e)}"}
 
 @api_router.post("/dosare/search/bulk")
 async def search_dosare_bulk(request: BulkSearchRequest, user: dict = Depends(get_current_user)):
