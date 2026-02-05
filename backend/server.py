@@ -498,10 +498,14 @@ async def search_dosare_csv(file: UploadFile = File(...)):
         "total_searched": len(numere)
     }
 
-def process_dosar(dosar: dict) -> dict:
+def process_dosar(dosar) -> dict:
     """Process a case to ensure proper serialization"""
     if not dosar:
         return {}
+    
+    # Handle if dosar is not a dict (string or other type)
+    if not isinstance(dosar, dict):
+        return {"numar": str(dosar), "parti": [], "sedinte": [], "caiAtac": []}
     
     processed = {
         "numar": dosar.get("numar", ""),
