@@ -93,6 +93,26 @@ class BulkSearchRequest(BaseModel):
     page: int = 1
     page_size: int = 20
 
+class UniversalSearchRequest(BaseModel):
+    """Universal search - auto-detects type and searches across all instances"""
+    termeni: List[str]  # List of search terms (case numbers or party names)
+    page: int = 1
+    page_size: int = 20
+
+class SearchResultRow(BaseModel):
+    """Single row in search results table"""
+    termen_cautare: str
+    tip_detectat: str
+    numar_dosar: str
+    instanta: str
+    obiect: str
+    stadiu_procesual: str
+    data: str
+    ultima_modificare: str
+    categorie_caz: str
+    nume_parte: str
+    calitate_parte: str
+
 class MonitoredCaseCreate(BaseModel):
     numar_dosar: str
     institutie: str
