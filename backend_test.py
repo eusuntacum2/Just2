@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-Comprehensive backend testing for Romanian legal case search system
-Tests universal search, auto-detection, export functionality, and diacritic handling
+Backend API Testing for Portal Dosare - Search Improvements
+Tests the new search functionality:
+1. One row per case (not per party)
+2. Case number search: Nume/Calitate empty
+3. Party name search: Nume/Calitate filled
+4. No results: Observații='Niciun rezultat găsit'
+5. Export includes Observații column
+6. Table has 12 columns including Observații
 """
 
 import requests
@@ -11,7 +17,7 @@ import re
 from datetime import datetime
 from typing import Dict, List, Any
 
-class RomanianLegalSearchTester:
+class PortalDosareSearchTester:
     def __init__(self, base_url="https://legal-monitor-3.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.tests_run = 0
