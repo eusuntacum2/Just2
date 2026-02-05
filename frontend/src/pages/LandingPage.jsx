@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '../components/ui/button';
-import { Scale, Search, Bell, FileText, Users, ChevronRight, Shield, Clock, Sun, Moon } from 'lucide-react';
+import { Scale, Search, Bell, FileText, ChevronRight, Shield, Clock, Sun, Moon, Building2, Users } from 'lucide-react';
 
 const LandingPage = () => {
     const { isAuthenticated } = useAuth();
@@ -11,19 +11,20 @@ const LandingPage = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-background relative">
+        <div className="min-h-screen bg-background">
             {/* Navigation */}
-            <nav className="sticky top-0 z-50 border-b border-border/40 backdrop-blur-xl bg-background/70">
-                <div className="px-6 md:px-12 lg:px-24 py-4 flex items-center justify-between">
+            <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+                <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-3" data-testid="logo-link">
-                        <Scale className="h-8 w-8 text-primary" />
-                        <span className="font-serif text-xl font-bold tracking-tight">Portal Dosare</span>
+                        <Scale className="h-7 w-7 text-primary" />
+                        <span className="font-serif text-xl font-semibold">Portal Dosare</span>
                     </Link>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={toggleTheme}
+                            className="rounded-full"
                             data-testid="theme-toggle"
                         >
                             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -48,108 +49,100 @@ const LandingPage = () => {
             </nav>
 
             {/* Hero Section */}
-            <section className="relative px-6 md:px-12 lg:px-24 py-20 md:py-32">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-                    <div className="md:col-span-7 space-y-6 animate-slide-up">
-                        <p className="text-xs uppercase tracking-widest text-muted-foreground font-sans">
-                            Portal Instanțe România
-                        </p>
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tight">
-                            Monitorizează-ți
-                            <span className="text-accent block mt-2">dosarele juridice</span>
-                        </h1>
-                        <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-                            Caută, monitorizează și primește notificări în timp real pentru toate dosarele de pe portalul just.ro. Acces direct la informații oficiale de la instanțele din România.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                            <Button 
-                                size="lg" 
-                                className="h-14 px-8 text-base transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                                onClick={() => navigate(isAuthenticated ? '/dashboard' : '/register')}
-                                data-testid="hero-cta-btn"
-                            >
-                                Începe acum
-                                <ChevronRight className="ml-2 h-5 w-5" />
-                            </Button>
+            <section className="max-w-6xl mx-auto px-6 py-20 md:py-28">
+                <div className="max-w-3xl mx-auto text-center space-y-8 animate-slide-up">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight">
+                        Caută și monitorizează
+                        <span className="text-primary block mt-2">dosare juridice</span>
+                    </h1>
+                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                        Accesează informații despre dosarele din toate instanțele din România. 
+                        Primește notificări când apar modificări în dosarele tale.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                        <Button 
+                            size="lg" 
+                            className="h-14 px-8 text-base"
+                            onClick={() => navigate('/search')}
+                            data-testid="hero-search-btn"
+                        >
+                            <Search className="mr-2 h-5 w-5" />
+                            Caută dosare
+                        </Button>
+                        {!isAuthenticated && (
                             <Button 
                                 variant="outline" 
                                 size="lg"
-                                className="h-14 px-8 text-base border-2"
-                                onClick={() => navigate('/search')}
-                                data-testid="hero-search-btn"
+                                className="h-14 px-8 text-base"
+                                onClick={() => navigate('/register')}
+                                data-testid="hero-cta-btn"
                             >
-                                <Search className="mr-2 h-5 w-5" />
-                                Caută dosar
+                                Creează cont gratuit
+                                <ChevronRight className="ml-2 h-5 w-5" />
                             </Button>
-                        </div>
-                    </div>
-                    <div className="md:col-span-5 relative">
-                        <div className="aspect-square relative">
-                            <img 
-                                src="https://images.unsplash.com/photo-1643324896137-f0928e76202a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzl8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGp1c3RpY2UlMjBzY2FsZXMlMjBnb2xkJTIwYW5kJTIwYmxhY2t8ZW58MHx8fHwxNzcwMzA1NTM5fDA&ixlib=rb-4.1.0&q=85"
-                                alt="Justice scales"
-                                className="w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                        </div>
+                        )}
                     </div>
                 </div>
             </section>
 
             {/* Features Section */}
-            <section className="px-6 md:px-12 lg:px-24 py-20 bg-muted/30">
-                <div className="text-center mb-16">
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-                        Funcționalități
-                    </p>
-                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                        Tot ce ai nevoie pentru dosarele tale
-                    </h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    {[
-                        {
-                            icon: Search,
-                            title: 'Căutare avansată',
-                            description: 'Caută după număr dosar, parte sau instituție. Suport pentru căutare bulk.'
-                        },
-                        {
-                            icon: Bell,
-                            title: 'Notificări în timp real',
-                            description: 'Primește alerte când apar modificări în dosarele monitorizate.'
-                        },
-                        {
-                            icon: FileText,
-                            title: 'Istoric complet',
-                            description: 'Vizualizează toate ședințele, soluțiile și căile de atac.'
-                        },
-                        {
-                            icon: Shield,
-                            title: 'Securitate',
-                            description: 'Date protejate cu autentificare JWT și acces controlat.'
-                        }
-                    ].map((feature, index) => (
-                        <div 
-                            key={index}
-                            className="bg-card border border-border p-6 h-full transition-all duration-300 hover:shadow-md"
-                            data-testid={`feature-card-${index}`}
-                        >
-                            <feature.icon className="h-10 w-10 text-accent mb-4" />
-                            <h3 className="font-serif text-xl font-bold mb-2">{feature.title}</h3>
-                            <p className="text-muted-foreground text-sm">{feature.description}</p>
-                        </div>
-                    ))}
+            <section className="border-y border-border bg-muted/30">
+                <div className="max-w-6xl mx-auto px-6 py-20">
+                    <div className="text-center mb-16">
+                        <p className="text-sm uppercase tracking-wider text-primary font-medium mb-3">
+                            Funcționalități
+                        </p>
+                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                            Tot ce ai nevoie pentru dosarele tale
+                        </h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {[
+                            {
+                                icon: Search,
+                                title: 'Căutare avansată',
+                                description: 'Caută după număr, parte sau instanță. Suport pentru căutare bulk.'
+                            },
+                            {
+                                icon: Building2,
+                                title: '240+ instanțe',
+                                description: 'Acces la toate judecătoriile, tribunalele și curțile de apel.'
+                            },
+                            {
+                                icon: Bell,
+                                title: 'Notificări',
+                                description: 'Primește alerte când apar modificări în dosarele monitorizate.'
+                            },
+                            {
+                                icon: Shield,
+                                title: 'Securitate',
+                                description: 'Date protejate cu autentificare JWT și acces controlat.'
+                            }
+                        ].map((feature, index) => (
+                            <div 
+                                key={index}
+                                className="p-6 rounded-xl bg-background border border-border/50 card-hover"
+                                data-testid={`feature-card-${index}`}
+                            >
+                                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                                    <feature.icon className="h-6 w-6 text-primary" />
+                                </div>
+                                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
 
             {/* Stats Section */}
-            <section className="px-6 md:px-12 lg:px-24 py-20">
+            <section className="max-w-6xl mx-auto px-6 py-20">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {[
-                        { value: '200+', label: 'Instanțe acoperite' },
+                        { value: '240+', label: 'Instanțe' },
                         { value: '24/7', label: 'Disponibilitate' },
-                        { value: 'API', label: 'Sursa oficială just.ro' },
-                        { value: '∞', label: 'Dosare monitorizabile' }
+                        { value: 'API', label: 'Sursa just.ro' },
+                        { value: '∞', label: 'Dosare' }
                     ].map((stat, index) => (
                         <div key={index} className="text-center">
                             <p className="font-mono text-4xl md:text-5xl font-bold text-primary">{stat.value}</p>
@@ -160,42 +153,47 @@ const LandingPage = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="px-6 md:px-12 lg:px-24 py-20 bg-primary text-primary-foreground">
-                <div className="max-w-3xl mx-auto text-center space-y-6">
-                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                        Gata să îți monitorizezi dosarele?
-                    </h2>
-                    <p className="text-primary-foreground/80 text-lg">
-                        Creează un cont gratuit și începe să urmărești evoluția dosarelor tale în timp real.
-                    </p>
-                    <Button 
-                        size="lg"
-                        variant="secondary"
-                        className="h-14 px-8 text-base transition-all duration-300 hover:-translate-y-0.5"
-                        onClick={() => navigate(isAuthenticated ? '/dashboard' : '/register')}
-                        data-testid="cta-register-btn"
-                    >
-                        Creează cont gratuit
-                        <ChevronRight className="ml-2 h-5 w-5" />
-                    </Button>
+            <section className="border-t border-border bg-primary text-primary-foreground">
+                <div className="max-w-6xl mx-auto px-6 py-20">
+                    <div className="max-w-2xl mx-auto text-center space-y-6">
+                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                            Începe să cauți dosare acum
+                        </h2>
+                        <p className="text-primary-foreground/80 text-lg">
+                            Căutarea este gratuită și nu necesită autentificare. 
+                            Creează cont doar pentru monitorizare.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                            <Button 
+                                size="lg"
+                                variant="secondary"
+                                className="h-14 px-8 text-base"
+                                onClick={() => navigate('/search')}
+                                data-testid="cta-search-btn"
+                            >
+                                <Search className="mr-2 h-5 w-5" />
+                                Caută dosare
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="px-6 md:px-12 lg:px-24 py-12 border-t border-border">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <Scale className="h-6 w-6 text-muted-foreground" />
-                        <span className="font-serif text-lg font-bold">Portal Dosare</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                        © 2024 Portal Dosare. Date furnizate de just.ro
-                    </p>
-                    <div className="flex items-center gap-4">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">
+            <footer className="border-t border-border">
+                <div className="max-w-6xl mx-auto px-6 py-8">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <Scale className="h-5 w-5 text-muted-foreground" />
+                            <span className="font-serif font-semibold">Portal Dosare</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                            Date furnizate de portalul just.ro
+                        </p>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4" />
                             Actualizări în timp real
-                        </span>
+                        </div>
                     </div>
                 </div>
             </footer>
