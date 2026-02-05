@@ -10,6 +10,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardHome from './pages/DashboardHome';
 import SearchPage from './pages/SearchPage';
+import PublicSearchPage from './pages/PublicSearchPage';
 import MonitoredPage from './pages/MonitoredPage';
 import NotificationsPage from './pages/NotificationsPage';
 import SettingsPage from './pages/SettingsPage';
