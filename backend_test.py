@@ -123,6 +123,7 @@ class PortalDosareAPITester:
         
         if success and 'access_token' in response:
             self.token = response['access_token']
+            self.admin_token = response['access_token']  # Set admin token since this is admin user
             self.user_id = response['user']['id']
             print(f"   Logged in as: {response['user']['name']} ({response['user']['role']})")
             return True
