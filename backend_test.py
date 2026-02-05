@@ -70,16 +70,179 @@ class PublicSearchAPITester:
         return success
 
     def test_get_institutii(self):
-        """Test get institutions endpoint"""
+        """Test get institutions endpoint - PUBLIC"""
         success, response = self.run_test(
-            "Get Institutions",
+            "Get Institutions (PUBLIC)",
             "GET", 
             "institutii",
-            200
+            200,
+            use_auth=False
         )
         if success and 'institutii' in response:
             print(f"   Found {len(response['institutii'])} institutions")
         return success
+
+    def test_public_search_dosare(self):
+        """Test public case search functionality - NO AUTH REQUIRED"""
+        # Test basic search without auth
+        success, response = self.run_test(
+            "Public Search Cases (NO AUTH)",
+            "POST",
+            "dosare/search",
+            200,
+            data={
+                "numar_dosar": "123/2024",
+                "institutie": "TribunalulBUCURESTI",
+                "page": 1,
+                "page_size": 20
+            },
+            use_auth=False
+        )
+        
+        if success:
+            # Check pagination metadata
+            required_keys = ['results', 'total_count', 'page', 'page_size', 'total_pages']
+            missing_keys = [key for key in required_keys if key not in response]
+            if missing_keys:
+                print(f"   ❌ Missing pagination keys: {missing_keys}")
+                return False
+            
+            print(f"   ✅ Pagination metadata present")
+            print(f"   Results: {len(response.get('results', []))}")
+            print(f"   Total count: {response.get('total_count', 0)}")
+            print(f"   Page: {response.get('page', 0)}")
+            print(f"   Page size: {response.get('page_size', 0)}")
+            print(f"   Total pages: {response.get('total_pages', 0)}")
+            
+            # Check page size limit (max 20)
+            if response.get('page_size', 0) > 20:
+                print(f"   ❌ Page size {response.get('page_size')} exceeds max 20")
+                return False
+            
+            print(f"   ✅ Page size within limit (≤20)")
+        
+        return success
+
+    def test_public_search_empty_results(self):
+        """Test public search with no results"""
+        success, response = self.run_test(
+            "Public Search Empty Results (NO AUTH)",
+            "POST",
+            "dosare/search",
+            200,
+            data={
+                "numar_dosar": "NONEXISTENT/999999/2099",
+                "page": 1,
+                "page_size": 20
+            },
+            use_auth=False
+        )
+        
+        if success:
+            # Check empty results structure
+            if response.get('total_count') != 0:
+                print(f"   ❌ Expected total_count: 0, got: {response.get('total_count')}")
+                return False
+            
+            if not isinstance(response.get('results'), list) or len(response.get('results', [])) != 0:
+                print(f"   ❌ Expected empty results array, got: {response.get('results')}")
+                return False
+            
+            print(f"   ✅ Empty results structure correct")
+        
+        return success
+
+    def test_public_search_error_format(self):
+        """Test public search error response format"""
+        success, response = self.run_test(
+            "Public Search Error Format (NO AUTH)",
+            "POST",
+            "dosare/search",
+            200,  # API returns 200 with error key for validation errors
+            data={
+                "data_start": "invalid-date-format",
+                "page": 1,
+                "page_size": 20
+            },
+            use_auth=False
+        )
+        
+        if success:
+            # Check error response has only 'error' key
+            if 'error' not in response:
+                print(f"   ❌ Expected 'error' key in response")
+                return False
+            
+            # Check no other keys besides 'error'
+            extra_keys = [key for key in response.keys() if key != 'error']
+            if extra_keys:
+                print(f"   ❌ Error response has extra keys: {extra_keys}")
+                return False
+            
+            print(f"   ✅ Error response format correct (only 'error' key)")
+            print(f"   Error message: {response.get('error')}")
+        
+        return success
+
+    def test_public_bulk_search(self):
+        """Test public bulk case search - NO AUTH REQUIRED"""
+        success, response = self.run_test(
+            "Public Bulk Search Cases (NO AUTH)",
+            "POST", 
+            "dosare/search/bulk",
+            200,
+            data={
+                "numere_dosare": ["123/2024", "456/2024"],
+                "institutie": "TribunalulBUCURESTI",
+                "page": 1,
+                "page_size": 20
+            },
+            use_auth=False
+        )
+        
+        if success:
+            # Check pagination metadata
+            required_keys = ['results', 'total_count', 'page', 'page_size', 'total_pages']
+            missing_keys = [key for key in required_keys if key not in response]
+            if missing_keys:
+                print(f"   ❌ Missing pagination keys: {missing_keys}")
+                return False
+            
+            print(f"   ✅ Bulk search pagination metadata present")
+            print(f"   Results: {len(response.get('results', []))}")
+            print(f"   Errors: {len(response.get('errors', []))}")
+        
+        return success
+
+    def test_monitored_cases_requires_auth(self):
+        """Test that monitored cases endpoints require authentication"""
+        # Test GET monitored cases without auth
+        success1, response1 = self.run_test(
+            "Get Monitored Cases (NO AUTH - should fail)",
+            "GET",
+            "monitorizare", 
+            401,
+            use_auth=False
+        )
+        
+        # Test POST monitored cases without auth
+        success2, response2 = self.run_test(
+            "Add Monitored Case (NO AUTH - should fail)",
+            "POST",
+            "monitorizare",
+            401,
+            data={
+                "numar_dosar": "TEST/123/2024",
+                "institutie": "TribunalulBUCURESTI",
+                "alias": "Test Case"
+            },
+            use_auth=False
+        )
+        
+        if success1 and success2:
+            print(f"   ✅ Monitored cases properly require authentication")
+        
+        return success1 and success2
 
     def test_register_admin(self):
         """Test user registration (first user becomes admin)"""
