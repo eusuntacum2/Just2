@@ -86,6 +86,8 @@ class CautareDosarRequest(BaseModel):
 class BulkSearchRequest(BaseModel):
     numere_dosare: List[str]
     institutie: Optional[str] = None
+    page: int = 1
+    page_size: int = 20
 
 class MonitoredCaseCreate(BaseModel):
     numar_dosar: str
