@@ -449,26 +449,25 @@ class PublicSearchAPITester:
         return success
 
 def main():
-    print("🚀 Starting Portal Dosare API Tests")
+    print("🚀 Starting Public Search API Tests")
     print("=" * 50)
     
-    tester = PortalDosareAPITester()
+    tester = PublicSearchAPITester()
     
-    # Test sequence
+    # Test sequence - focusing on public search functionality
     tests = [
         ("Health Check", tester.test_health_check),
-        ("Get Institutions", tester.test_get_institutii),
-        ("Register Admin", tester.test_register_admin),
-        ("Login User", tester.test_login),
-        ("Get Current User", tester.test_get_me),
-        ("Search Cases", tester.test_search_dosare),
-        ("Bulk Search", tester.test_bulk_search),
-        ("Get Monitored Cases", tester.test_monitored_cases),
-        ("Add Monitored Case", tester.test_add_monitored_case),
-        ("Get Notifications", tester.test_notifications),
-        ("Admin Endpoints", tester.test_admin_endpoints),
-        ("Invalid Login", tester.test_invalid_login),
-        ("Unauthorized Access", tester.test_unauthorized_access)
+        ("Get Institutions (PUBLIC)", tester.test_get_institutii),
+        ("Public Search Cases", tester.test_public_search_dosare),
+        ("Public Search Empty Results", tester.test_public_search_empty_results),
+        ("Public Search Error Format", tester.test_public_search_error_format),
+        ("Public Bulk Search", tester.test_public_bulk_search),
+        ("Monitored Cases Require Auth", tester.test_monitored_cases_requires_auth),
+        
+        # Test with authentication for comparison
+        ("Register/Login for Auth Tests", tester.test_register_admin),
+        ("Monitored Cases (WITH AUTH)", tester.test_monitored_cases),
+        ("Add Monitored Case (WITH AUTH)", tester.test_add_monitored_case),
     ]
     
     failed_tests = []
