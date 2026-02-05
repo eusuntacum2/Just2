@@ -80,6 +80,8 @@ class CautareDosarRequest(BaseModel):
     institutie: Optional[str] = None
     data_start: Optional[str] = None
     data_stop: Optional[str] = None
+    page: int = 1
+    page_size: int = 20
 
 class BulkSearchRequest(BaseModel):
     numere_dosare: List[str]
