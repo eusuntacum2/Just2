@@ -37,13 +37,13 @@ Portal pentru monitorizarea dosarelor de pe just.ro integrat cu API-ul SOAP http
 - `/api/admin/stats` - Statistici sistem (ADMIN)
 - `/api/institutii` - Lista instituțiilor
 
-### Recent Update: Căutare Publică + Paginare
-- Căutarea dosarelor accesibilă fără autentificare
-- Paginare cu max 20 rezultate/pagină
-- Răspuns structurat: results, total_count, page, total_pages, page_size
-- Ordonare descrescătoare după data înregistrării
-- Format erori: {"error": "descriere"}
-- Rezultate goale: {"results": [], "total_count": 0, ...}
+### Recent Update: Lista Instanțe Completă + Design Modern (05.02.2026)
+- Lista completă cu 232 instanțe judiciare
+- Dropdown cu căutare/filtrare rapidă (Command component)
+- Instanțe sortate alfabetic după nume
+- Design modern: fonturi Inter + Source Serif 4
+- Spațiu generos, culori deschise, interfață aerisită
+- Tema light/dark cu tranziție fluidă
 
 ### Frontend (React + Tailwind + shadcn/ui)
 - Landing page cu CTA
