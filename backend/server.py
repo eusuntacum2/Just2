@@ -567,8 +567,15 @@ async def update_me(update_data: UserUpdate, user: dict = Depends(get_current_us
 
 @api_router.get("/institutii")
 async def get_institutii():
-    """Get list of available institutions"""
-    return {"institutii": INSTITUTII}
+    """Get list of available institutions with display names, sorted alphabetically"""
+    # Return both key and display name, sorted by display name
+    sorted_items = sorted(INSTITUTII_MAP.items(), key=lambda x: x[1])
+    return {
+        "institutii": [
+            {"key": key, "name": name}
+            for key, name in sorted_items
+        ]
+    }
 
 @api_router.post("/dosare/search")
 async def search_dosare(request: CautareDosarRequest):
