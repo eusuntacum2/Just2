@@ -440,7 +440,7 @@ class PortalDosareSearchTester:
 
 def main():
     """Main test execution"""
-    tester = RomanianLegalSearchTester()
+    tester = PortalDosareSearchTester()
     results = tester.run_all_tests()
     
     # Return appropriate exit code
