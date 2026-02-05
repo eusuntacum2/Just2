@@ -958,13 +958,6 @@ async def universal_search(request: UniversalSearchRequest):
                 "calitate_parte": "",
                 "observatii": f"Eroare: {str(e)[:50]}"
             })
-                "stadiu_procesual": "",
-                "data": "",
-                "ultima_modificare": "",
-                "categorie_caz": "",
-                "nume_parte": f"Eroare: {str(e)[:50]}",
-                "calitate_parte": ""
-            })
     
     # Pagination
     total_count = len(all_rows)
