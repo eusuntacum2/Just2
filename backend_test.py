@@ -216,21 +216,21 @@ class PublicSearchAPITester:
 
     def test_monitored_cases_requires_auth(self):
         """Test that monitored cases endpoints require authentication"""
-        # Test GET monitored cases without auth
+        # Test GET monitored cases without auth (expect 403 or 401)
         success1, response1 = self.run_test(
             "Get Monitored Cases (NO AUTH - should fail)",
             "GET",
             "monitorizare", 
-            401,
+            403,  # FastAPI returns 403 for missing auth
             use_auth=False
         )
         
-        # Test POST monitored cases without auth
+        # Test POST monitored cases without auth (expect 403 or 401)
         success2, response2 = self.run_test(
             "Add Monitored Case (NO AUTH - should fail)",
             "POST",
             "monitorizare",
-            401,
+            403,  # FastAPI returns 403 for missing auth
             data={
                 "numar_dosar": "TEST/123/2024",
                 "institutie": "TribunalulBUCURESTI",
@@ -243,6 +243,28 @@ class PublicSearchAPITester:
             print(f"   ✅ Monitored cases properly require authentication")
         
         return success1 and success2
+
+    def test_add_monitored_case(self):
+        """Test adding a case to monitoring"""
+        # Use a unique case number to avoid conflicts
+        unique_case = f"TEST/{datetime.now().strftime('%H%M%S')}/2024"
+        
+        success, response = self.run_test(
+            "Add Monitored Case",
+            "POST",
+            "monitorizare",
+            200,
+            data={
+                "numar_dosar": unique_case,
+                "institutie": "TribunalulBUCURESTI",
+                "alias": "Test Case"
+            }
+        )
+        
+        if success:
+            print(f"   Added case: {response.get('numar_dosar')}")
+            return response.get('id')
+        return None
 
     def test_register_admin(self):
         """Test user registration (first user becomes admin)"""
