@@ -798,12 +798,11 @@ async def search_dosare_csv(file: UploadFile = File(...)):
 
 # ============== UNIVERSAL SEARCH (DIACRITIC-INSENSITIVE) ==============
 
-def process_dosar_to_rows(dosar: dict, search_term: str, search_type: str) -> List[dict]:
-    """Convert a dosar to table rows - one row per party"""
+def process_dosar_to_row(dosar: dict, search_term: str, search_type: str) -> dict:
+    """Convert a dosar to a SINGLE table row (one row per case, not per party)"""
     if not dosar or not isinstance(dosar, dict):
-        return []
+        return {}
     
-    rows = []
     instanta_key = dosar.get("institutie", "")
     instanta_name = INSTITUTII_MAP.get(str(instanta_key), str(instanta_key))
     
@@ -831,7 +830,6 @@ def process_dosar_to_rows(dosar: dict, search_term: str, search_type: str) -> Li
             sedinte_list = []
         
         if sedinte_list:
-            # Get most recent sedinta date
             dates = []
             for s in sedinte_list:
                 if isinstance(s, dict) and s.get("data"):
@@ -844,8 +842,8 @@ def process_dosar_to_rows(dosar: dict, search_term: str, search_type: str) -> Li
                 dates.sort(reverse=True)
                 ultima_modificare = dates[0]
     
-    # Base row data
-    base_row = {
+    # Build row based on search type
+    row = {
         "termen_cautare": search_term,
         "tip_detectat": search_type,
         "numar_dosar": dosar.get("numar", ""),
@@ -856,28 +854,45 @@ def process_dosar_to_rows(dosar: dict, search_term: str, search_type: str) -> Li
         "ultima_modificare": ultima_modificare,
         "categorie_caz": str(dosar.get("categorieCaz", "")),
         "nume_parte": "",
-        "calitate_parte": ""
+        "calitate_parte": "",
+        "observatii": ""
     }
     
-    # Process parties
-    parti_raw = dosar.get("parti")
-    parti_list = []
-    if parti_raw:
-        if isinstance(parti_raw, dict) and "DosarParte" in parti_raw:
-            parti_list = parti_raw.get("DosarParte", [])
-        elif isinstance(parti_raw, list):
-            parti_list = parti_raw
-    
-    if parti_list:
+    # If search by "Număr dosar" -> leave Nume Parte and Calitate empty
+    # If search by "Nume parte" -> find and show the matching party
+    if search_type == "Nume parte":
+        # Find the party that matches the search term
+        parti_raw = dosar.get("parti")
+        parti_list = []
+        if parti_raw:
+            if isinstance(parti_raw, dict) and "DosarParte" in parti_raw:
+                parti_list = parti_raw.get("DosarParte", [])
+            elif isinstance(parti_raw, list):
+                parti_list = parti_raw
+        
+        # Search for matching party (diacritic-insensitive)
+        search_normalized = normalize_diacritics(search_term)
+        found_party = None
         for parte in parti_list:
             if isinstance(parte, dict):
-                row = base_row.copy()
-                row["nume_parte"] = parte.get("nume", "")
-                row["calitate_parte"] = parte.get("calitateParte", "")
-                rows.append(row)
-    else:
-        # No parties - still add one row
-        rows.append(base_row)
+                party_name = parte.get("nume", "")
+                if search_normalized in normalize_diacritics(party_name):
+                    found_party = parte
+                    break
+        
+        if found_party:
+            row["nume_parte"] = found_party.get("nume", "")
+            row["calitate_parte"] = found_party.get("calitateParte", "")
+        elif parti_list:
+            # If no exact match, show first party as reference
+            first_party = parti_list[0] if parti_list else {}
+            if isinstance(first_party, dict):
+                row["nume_parte"] = first_party.get("nume", "")
+                row["calitate_parte"] = first_party.get("calitateParte", "")
+    
+    # For "Număr dosar" search, Nume Parte and Calitate stay empty (as per requirement)
+    
+    return row
     
     return rows
 
