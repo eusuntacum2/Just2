@@ -443,13 +443,17 @@ async def search_dosare_bulk(request: BulkSearchRequest):
     }
 
 @api_router.post("/dosare/search/csv")
-async def search_dosare_csv(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
-    """Search cases from CSV file"""
+async def search_dosare_csv(file: UploadFile = File(...)):
+    """Search cases from CSV file - PUBLIC (no auth required)"""
     if not file.filename.endswith('.csv'):
-        raise HTTPException(status_code=400, detail="File must be CSV")
+        return {"error": "Fișierul trebuie să fie CSV"}
     
-    content = await file.read()
-    decoded = content.decode('utf-8')
+    try:
+        content = await file.read()
+        decoded = content.decode('utf-8')
+    except Exception:
+        return {"error": "Eroare la citirea fișierului"}
+    
     reader = csv.reader(io.StringIO(decoded))
     
     numere = []
@@ -460,6 +464,9 @@ async def search_dosare_csv(file: UploadFile = File(...), user: dict = Depends(g
     # Remove header if present
     if numere and not any(c.isdigit() for c in numere[0]):
         numere = numere[1:]
+    
+    if not numere:
+        return {"error": "Fișierul nu conține numere de dosare valide"}
     
     results = []
     errors = []
