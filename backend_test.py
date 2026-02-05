@@ -279,7 +279,7 @@ class PortalDosareAPITester:
             "GET",
             "auth/me",
             401,
-            headers={}  # No auth header
+            headers={'Authorization': ''}  # Empty auth header
         )
         return success
 
