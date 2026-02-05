@@ -378,11 +378,13 @@ async def search_dosare(request: CautareDosarRequest):
         processed = []
         if results:
             for dosar in results:
-                if dosar:
-                    processed.append(process_dosar(dosar))
+                if dosar and isinstance(dosar, dict):
+                    p = process_dosar(dosar)
+                    if isinstance(p, dict):
+                        processed.append(p)
         
         # Sort by data descending (most recent first)
-        processed.sort(key=lambda x: x.get("data", "") or "", reverse=True)
+        processed.sort(key=lambda x: x.get("data", "") if isinstance(x, dict) else "", reverse=True)
         
         # Pagination
         total_count = len(processed)
