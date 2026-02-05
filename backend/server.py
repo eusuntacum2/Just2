@@ -985,7 +985,7 @@ async def universal_search(request: UniversalSearchRequest):
         "headers": [
             "Termen Căutare", "Tip Detectat", "Număr Dosar", "Instanță",
             "Obiect", "Stadiu Procesual", "Data", "Ultima Modificare",
-            "Categorie Caz", "Nume Parte", "Calitate parte"
+            "Categorie Caz", "Nume Parte", "Calitate parte", "Observații"
         ]
     }
 
@@ -994,13 +994,13 @@ async def universal_search(request: UniversalSearchRequest):
 EXPORT_HEADERS = [
     "Termen Căutare", "Tip Detectat", "Număr Dosar", "Instanță",
     "Obiect", "Stadiu Procesual", "Data", "Ultima Modificare",
-    "Categorie Caz", "Nume Parte", "Calitate parte"
+    "Categorie Caz", "Nume Parte", "Calitate parte", "Observații"
 ]
 
 EXPORT_FIELDS = [
     "termen_cautare", "tip_detectat", "numar_dosar", "instanta",
     "obiect", "stadiu_procesual", "data", "ultima_modificare",
-    "categorie_caz", "nume_parte", "calitate_parte"
+    "categorie_caz", "nume_parte", "calitate_parte", "observatii"
 ]
 
 @api_router.post("/dosare/export/xlsx")
