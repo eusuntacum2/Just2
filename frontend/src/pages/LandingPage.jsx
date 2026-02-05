@@ -75,7 +75,7 @@ const LandingPage = () => {
                                 variant="outline" 
                                 size="lg"
                                 className="h-14 px-8 text-base border-2"
-                                onClick={() => navigate(isAuthenticated ? '/search' : '/login')}
+                                onClick={() => navigate('/search')}
                                 data-testid="hero-search-btn"
                             >
                                 <Search className="mr-2 h-5 w-5" />
