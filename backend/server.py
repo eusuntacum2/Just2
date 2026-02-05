@@ -1081,6 +1081,13 @@ async def export_txt(request: UniversalSearchRequest):
 # ============== PROCESS DOSAR ==============
 
 def process_dosar(dosar) -> dict:
+    """Process a case to ensure proper serialization"""
+    if not dosar:
+        return {}
+    
+    # Handle if dosar is not a dict (string or other type)
+    if not isinstance(dosar, dict):
+        return {"numar": str(dosar), "parti": [], "sedinte": [], "caiAtac": []}
     
     processed = {
         "numar": dosar.get("numar", ""),
