@@ -531,17 +531,34 @@ def process_dosar(dosar) -> dict:
         "obiect": dosar.get("obiect", ""),
     }
     
-    # Process parties
-    if dosar.get("parti"):
+    # Process parties - handle nested DosarParte structure
+    parti_raw = dosar.get("parti")
+    if parti_raw:
+        # Check if it's the nested structure with DosarParte
+        if isinstance(parti_raw, dict) and "DosarParte" in parti_raw:
+            parti_list = parti_raw.get("DosarParte", [])
+        elif isinstance(parti_raw, list):
+            parti_list = parti_raw
+        else:
+            parti_list = []
+        
         processed["parti"] = [
             {"nume": p.get("nume", ""), "calitateParte": p.get("calitateParte", "")}
-            for p in dosar["parti"] if p
+            for p in parti_list if p and isinstance(p, dict)
         ]
     else:
         processed["parti"] = []
     
-    # Process hearings
-    if dosar.get("sedinte"):
+    # Process hearings - handle nested DosarSedinta structure
+    sedinte_raw = dosar.get("sedinte")
+    if sedinte_raw:
+        if isinstance(sedinte_raw, dict) and "DosarSedinta" in sedinte_raw:
+            sedinte_list = sedinte_raw.get("DosarSedinta", [])
+        elif isinstance(sedinte_raw, list):
+            sedinte_list = sedinte_raw
+        else:
+            sedinte_list = []
+        
         processed["sedinte"] = [
             {
                 "complet": s.get("complet", ""),
@@ -550,20 +567,28 @@ def process_dosar(dosar) -> dict:
                 "solutie": s.get("solutie", ""),
                 "solutieSumar": s.get("solutieSumar", "")
             }
-            for s in dosar["sedinte"] if s
+            for s in sedinte_list if s and isinstance(s, dict)
         ]
     else:
         processed["sedinte"] = []
     
-    # Process appeals
-    if dosar.get("caiAtac"):
+    # Process appeals - handle nested DosarCaleAtac structure
+    cai_raw = dosar.get("caiAtac")
+    if cai_raw:
+        if isinstance(cai_raw, dict) and "DosarCaleAtac" in cai_raw:
+            cai_list = cai_raw.get("DosarCaleAtac", [])
+        elif isinstance(cai_raw, list):
+            cai_list = cai_raw
+        else:
+            cai_list = []
+        
         processed["caiAtac"] = [
             {
                 "dataDeclarare": str(c.get("dataDeclarare", "")) if c.get("dataDeclarare") else "",
                 "parteDeclaratoare": c.get("parteDeclaratoare", ""),
                 "tipCaleAtac": c.get("tipCaleAtac", "")
             }
-            for c in dosar["caiAtac"] if c
+            for c in cai_list if c and isinstance(c, dict)
         ]
     else:
         processed["caiAtac"] = []
