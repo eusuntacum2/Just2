@@ -292,7 +292,7 @@ const SearchPage = () => {
                             </div>
                             <div className="space-y-2">
                                 <Label>Instituție (opțional)</Label>
-                                <Select value={bulkInstitutie} onValueChange={setBulkInstitutie}>
+                                <Select value={bulkInstitutie} onValueChange={(value) => setBulkInstitutie(value === "all" ? "" : value)}>
                                     <SelectTrigger className="h-12" data-testid="bulk-select-institutie">
                                         <SelectValue placeholder="Toate instituțiile" />
                                     </SelectTrigger>
