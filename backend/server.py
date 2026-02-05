@@ -982,6 +982,151 @@ async def universal_search(request: UniversalSearchRequest):
         ]
     }
 
+# ============== CASE DETAILS ENDPOINT ==============
+
+class CaseDetailsRequest(BaseModel):
+    numar_dosar: str
+    institutie: Optional[str] = None
+
+def format_date(date_val) -> str:
+    """Format date value, return '-' if empty"""
+    if not date_val:
+        return "-"
+    try:
+        d = str(date_val)
+        if 'T' in d:
+            return d.split('T')[0]
+        return d[:10] if len(d) >= 10 else d
+    except:
+        return "-"
+
+def safe_str(val, default="-") -> str:
+    """Safe string conversion with default for None/empty"""
+    if val is None or val == "":
+        return default
+    return str(val)
+
+@api_router.post("/dosare/detalii")
+async def get_case_details(request: CaseDetailsRequest):
+    """
+    Get full case details for the case details page.
+    Returns all information: detalii, parti, sedinte, cai_atac.
+    """
+    try:
+        results = await async_cautare_dosare(
+            numar_dosar=request.numar_dosar,
+            institutie=request.institutie if request.institutie else None
+        )
+        
+        if not results:
+            return {"error": "Dosarul nu a fost găsit", "found": False}
+        
+        dosar = results[0] if results else None
+        if not dosar or not isinstance(dosar, dict):
+            return {"error": "Dosarul nu a fost găsit", "found": False}
+        
+        # Get institution name
+        instanta_key = dosar.get("institutie", "")
+        instanta_name = INSTITUTII_MAP.get(str(instanta_key), safe_str(instanta_key))
+        
+        # Calculate ultima modificare from sedinte
+        ultima_modificare = "-"
+        sedinte_raw = dosar.get("sedinte")
+        sedinte_list = []
+        if sedinte_raw:
+            if isinstance(sedinte_raw, dict) and "DosarSedinta" in sedinte_raw:
+                sedinte_list = sedinte_raw.get("DosarSedinta", [])
+            elif isinstance(sedinte_raw, list):
+                sedinte_list = sedinte_raw
+        
+        if sedinte_list:
+            dates = []
+            for s in sedinte_list:
+                if isinstance(s, dict) and s.get("data"):
+                    dates.append(format_date(s.get("data")))
+            if dates:
+                dates.sort(reverse=True)
+                ultima_modificare = dates[0]
+        
+        # Section A: Detalii Dosar
+        detalii = {
+            "numar_dosar": safe_str(dosar.get("numar")),
+            "numar_dosar_vechi": safe_str(dosar.get("numarVechi")),
+            "data": format_date(dosar.get("data")),
+            "instanta": instanta_name,
+            "departament": safe_str(dosar.get("departament")),
+            "obiect": safe_str(dosar.get("obiect")),
+            "stadiu_procesual": safe_str(dosar.get("stadiuProcesual")),
+            "categorie_caz": safe_str(dosar.get("categorieCaz")),
+            "ultima_modificare": ultima_modificare
+        }
+        
+        # Section B: Părți implicate
+        parti_raw = dosar.get("parti")
+        parti_list_raw = []
+        if parti_raw:
+            if isinstance(parti_raw, dict) and "DosarParte" in parti_raw:
+                parti_list_raw = parti_raw.get("DosarParte", [])
+            elif isinstance(parti_raw, list):
+                parti_list_raw = parti_raw
+        
+        parti = []
+        for p in parti_list_raw:
+            if isinstance(p, dict):
+                parti.append({
+                    "nume": safe_str(p.get("nume")),
+                    "calitate": safe_str(p.get("calitateParte")),
+                    "info": "-"  # API doesn't provide extra info
+                })
+        
+        # Section C: Ședințe de judecată
+        sedinte = []
+        for s in sedinte_list:
+            if isinstance(s, dict):
+                sedinte.append({
+                    "data_sedinta": format_date(s.get("data")),
+                    "ora": safe_str(s.get("ora")),
+                    "solutie": safe_str(s.get("solutie")),
+                    "solutie_sumar": safe_str(s.get("solutieSumar")),
+                    "data_pronuntare": format_date(s.get("dataPronuntare")) if s.get("dataPronuntare") else "-",
+                    "complet": safe_str(s.get("complet")),
+                    "document": "-"  # API structure
+                })
+        
+        # Sort sedinte by date descending
+        sedinte.sort(key=lambda x: x.get("data_sedinta", ""), reverse=True)
+        
+        # Section D: Căi de atac
+        cai_raw = dosar.get("caiAtac")
+        cai_list_raw = []
+        if cai_raw:
+            if isinstance(cai_raw, dict) and "DosarCaleAtac" in cai_raw:
+                cai_list_raw = cai_raw.get("DosarCaleAtac", [])
+            elif isinstance(cai_raw, list):
+                cai_list_raw = cai_raw
+        
+        cai_atac = []
+        for c in cai_list_raw:
+            if isinstance(c, dict):
+                cai_atac.append({
+                    "data_declaratie": format_date(c.get("dataDeclarare")),
+                    "parte_declaratoare": safe_str(c.get("parteDeclaratoare")),
+                    "cale_atac": safe_str(c.get("tipCaleAtac")),
+                    "dosar_instanta_superioara": safe_str(c.get("dosarInstantaSuperioara"))
+                })
+        
+        return {
+            "found": True,
+            "detalii": detalii,
+            "parti": parti,
+            "sedinte": sedinte,
+            "cai_atac": cai_atac
+        }
+        
+    except Exception as e:
+        logging.error(f"Case details error: {e}")
+        return {"error": f"Eroare la încărcarea dosarului: {str(e)}", "found": False}
+
 # ============== EXPORT ENDPOINTS ==============
 
 EXPORT_HEADERS = [
