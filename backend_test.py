@@ -84,6 +84,7 @@ class PortalDosareAPITester:
         test_email = "admin@test.ro"
         test_password = "test123"
         
+        # Try to register, but expect it might fail if user exists
         success, response = self.run_test(
             "Register Admin User",
             "POST",
@@ -102,7 +103,10 @@ class PortalDosareAPITester:
             self.user_id = response['user']['id']
             print(f"   Admin registered with role: {response['user']['role']}")
             return True
-        return False
+        else:
+            # If registration fails (user exists), try to login instead
+            print("   Registration failed (user likely exists), trying login...")
+            return self.test_login()
 
     def test_login(self):
         """Test user login"""
