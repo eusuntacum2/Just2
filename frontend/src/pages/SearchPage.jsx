@@ -56,7 +56,11 @@ const SearchPage = () => {
         setErrors([]);
         
         try {
-            const response = await api.post('/dosare/search', singleForm);
+            const searchData = {
+                ...singleForm,
+                institutie: singleForm.institutie === 'all' ? '' : singleForm.institutie
+            };
+            const response = await api.post('/dosare/search', searchData);
             setResults(response.data.results);
             if (response.data.count === 0) {
                 toast.info('Nu s-au găsit rezultate');
