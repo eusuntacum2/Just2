@@ -28,14 +28,22 @@ Portal pentru monitorizarea dosarelor de pe just.ro integrat cu API-ul SOAP http
 
 ### Backend (FastAPI + MongoDB)
 - `/api/auth/*` - Register, Login, Me, Update profile (JWT)
-- `/api/dosare/search` - Căutare individuală
-- `/api/dosare/search/bulk` - Căutare multiple numere
-- `/api/dosare/search/csv` - Upload CSV pentru căutare
-- `/api/monitorizare/*` - CRUD dosare monitorizate + refresh
-- `/api/notifications/*` - Get, mark read, mark all read
-- `/api/admin/users` - Gestionare utilizatori
-- `/api/admin/stats` - Statistici sistem
+- `/api/dosare/search` - Căutare individuală **PUBLIC**
+- `/api/dosare/search/bulk` - Căutare multiple numere **PUBLIC**
+- `/api/dosare/search/csv` - Upload CSV pentru căutare **PUBLIC**
+- `/api/monitorizare/*` - CRUD dosare monitorizate + refresh (AUTH REQUIRED)
+- `/api/notifications/*` - Get, mark read, mark all read (AUTH REQUIRED)
+- `/api/admin/users` - Gestionare utilizatori (ADMIN)
+- `/api/admin/stats` - Statistici sistem (ADMIN)
 - `/api/institutii` - Lista instituțiilor
+
+### Recent Update: Căutare Publică + Paginare
+- Căutarea dosarelor accesibilă fără autentificare
+- Paginare cu max 20 rezultate/pagină
+- Răspuns structurat: results, total_count, page, total_pages, page_size
+- Ordonare descrescătoare după data înregistrării
+- Format erori: {"error": "descriere"}
+- Rezultate goale: {"results": [], "total_count": 0, ...}
 
 ### Frontend (React + Tailwind + shadcn/ui)
 - Landing page cu CTA
