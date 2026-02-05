@@ -67,6 +67,7 @@ function AppRoutes() {
         <Routes>
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/search" element={<PublicSearchPage />} />
             <Route path="/login" element={
                 <PublicRoute>
                     <LoginPage />
