@@ -1,0 +1,171 @@
+<analysis>**original_problem_statement:**
+The user wants to build a web portal that interacts with the  SOAP API ().
+
+PRODUCT REQUIREMENTS:
+- **Core Functionality:**
+    - The portal should allow public (unauthenticated) users to search for legal cases (dosare).
+    - The search must be diacritic-insensitive.
+    - Search should be possible by Case Number (Număr dosar) or Party Name (Nume Parte din dosar), across all courts.
+    - Search results should be displayed in a compact table with 12 specific columns, with one row per case. If a search is by case number, party-specific columns should be empty.
+    - The case number in the results table must be a hyperlink to a detailed case page.
+    - The case details page should display comprehensive information scraped from the API, structured into sections: Case Details, Parties, Hearings, and Appeals.
+    - Users should be able to download search results in Excel (.xlsx), CSV, and TXT formats.
+- **Authenticated Functionality:**
+    - Registered users can monitor specific cases.
+    - Users should receive notifications (in-app or email) when a monitored case is updated.
+- **User Roles:**
+    - : Can search and monitor their own selected cases.
+    - : Can manage users and has access to all functionalities.
+- **Technical Stack Pivot:** The user has requested a complete conversion of the project from the initial Python/React/MongoDB stack to a **PHP/MySQL stack**. The new application should use Bootstrap for the frontend and standard PHP sessions for authentication.
+
+**User's preferred language**: Romanian
+
+**what currently exists?**
+A functional full-stack application built with a FastAPI (Python) backend, a React frontend, and a MongoDB database. The application successfully implements public diacritic-insensitive search, result exporting (CSV, XLSX, TXT), and the basic structure for JWT-based authentication and case monitoring. However, this entire stack is now deprecated due to a user request to pivot to PHP. The existing code serves as a functional reference for the features that need to be rebuilt in PHP.
+
+**Last working item**:
+- **Last item agent was working:** The agent received a request to convert the entire project from Python/React/MongoDB to PHP/MySQL. It analyzed the complexity, created a conceptual checklist for the conversion, and clarified the new tech stack requirements with the user (MySQL, Bootstrap, PHP Sessions). The agent was preparing to start the implementation by creating the new PHP project structure.
+- **Status:** NOT STARTED
+- **Agent Testing Done:** N/A (The new PHP project has not been created yet)
+- **Which testing method agent to use?** both
+- **User Testing Done:** N/A
+
+**All Pending/In progress Issue list**:
+There are no pending issues with the old Python/React application. The entire focus has shifted to building the new PHP application from scratch.
+
+**In progress Task List**:
+- **Task 1:** Complete the Case Details Page feature (P1)
+    - **Where to resume:** This feature was partially started on the React frontend ( was created) and the backend ( endpoint was added in Python). It must now be implemented from scratch in the new PHP application. The backend will need a PHP endpoint to fetch detailed case data, and the frontend will need a PHP page to render the four required sections (Details, Parties, Hearings, Appeals).
+    - **What will be achieved with this?** Users will be able to click on a case number in the search results and view all its details on a dedicated page.
+    - **Status:** BLOCKED
+    - **Should Test frontend/backend/both after fix?** both
+    - **Blocked on something:** Blocked by the main PHP conversion task.
+
+**Upcoming and Future Tasks**
+- **Upcoming Tasks:**
+  - **P0: Convert the entire application to PHP/MySQL.** This is the highest priority task and involves rewriting everything:
+      - **Backend:** Create PHP API endpoints for universal search, case details, and exports. Integrate the  SOAP API using PHP's native .
+      - **Database:** Design and create a MySQL schema for users, monitored cases, and notifications. Create an installation script ().
+      - **Frontend:** Build the user interface using PHP for templating, styled with Bootstrap, including the search page, results table, and the new case details page.
+      - **Authentication:** Implement a user registration and login system using PHP sessions and  for password hashing.
+  - **P1: Implement background job for case monitoring.**
+      - A cron job or scheduled task in PHP needs to be created to periodically check for updates in monitored cases.
+  - **P2: Implement email notifications.**
+      - Integrate an email service (like SendGrid or Resend, as previously discussed) to send alerts to users when their monitored cases are updated.
+
+- **Future Tasks:**
+  - Implement the Admin Panel for user management and system statistics in the new PHP version.
+  - Add robust error handling for SOAP API timeouts or connection issues.
+
+**Completed work in this session**
+The following features were fully implemented and tested on the (now deprecated) Python/React stack:
+- **User Authentication:** JWT-based registration and login system.
+- **Court List Management:** Updated the full list of courts from a file and implemented a searchable dropdown in the UI.
+- **Diacritic-Insensitive Universal Search:** A single search endpoint that can handle queries by case number or party name, ignoring diacritics.
+- **Refined Search Results:** Implemented logic to show one row per case (not per party) and added a dedicated Observations column for messages like No results found.
+- **Data Export:** Functionality to download search results as Excel, CSV, and TXT files with correct UTF-8 encoding.
+- **Modern UI:** The UI was updated with a more modern, spacious design, and a compact, no-scroll results table.
+
+**Earlier issues found/mentioned but not fixed**
+- The external preview URL was intermittently unavailable during development. The agent identified this as a potential infrastructure issue on the platform side, not a bug in the application code.
+
+**Known issue recurrence from previous fork**
+- None.
+
+**Code Architecture**
+The current (deprecated) architecture is:
+- **Frontend:** React () with functional components, hooks (, ), and pages for each feature.
+- **Backend:** FastAPI () with a single-file structure, Pydantic models for data validation, and APIRouters.
+- **Database:** MongoDB.
+- **External API:**  SOAP API, consumed via the  Python library.
+
+The **target** architecture is:
+- **Backend/Frontend:** A monolithic PHP application. It will have a directory structure like , , . It will use native PHP sessions for auth and  for the external API. UI will be rendered via PHP templates styled with Bootstrap.
+- **Database:** MySQL.
+
+**Key Technical Concepts**
+- **Current:** Python (FastAPI), React, MongoDB, JWT, SOAP (via ).
+- **Target:** PHP, MySQL, HTML/CSS/JavaScript, Bootstrap, PHP Sessions, SOAP (via ).
+
+**key DB schema**
+- **MongoDB (Deprecated):**
+  - : {email, password_hash, role, ...}
+  - : {user_id, case_number, last_checked, ...}
+  - : {user_id, message, is_read, ...}
+- **MySQL (Planned):**
+  - : (id, email, password, role, ...)
+  - : (id, user_id, case_number, ...)
+  - : (id, user_id, message, ...)
+
+**changes in tech stack**
+- The entire technology stack is being migrated from Python/React/MongoDB to PHP/MySQL.
+
+**All files of reference**
+- : The main file for the deprecated FastAPI backend, contains all API logic.
+- : The primary UI component for the public search feature in the deprecated React app.
+- : A placeholder component created for the case details page, which needs to be implemented in PHP.
+- : The Product Requirements Document, which has been updated throughout the session.
+- : A text file containing the full list of Romanian courts.
+
+**Areas that need refactoring**:
+The entire project is being replaced, not refactored. The existing Python/React code should be used as a feature and logic reference only.
+
+**key api endpoints**
+Key endpoints in the deprecated FastAPI backend (to be replicated in PHP):
+- : Get the list of courts.
+- : The main search endpoint.
+- : Endpoints for downloading results (xlsx, csv, txt).
+- : Endpoint to get full details for one case.
+-  & : User authentication.
+- : Endpoints for managing monitored cases (auth required).
+
+**Critical Info for New Agent**
+- **PIVOT TO PHP:** The most critical instruction is the complete pivot from a Python/React/MongoDB stack to a PHP/MySQL stack. Do not continue working on the Python/React codebase. All new development must be in PHP.
+- **User Confirmation:** The user has confirmed the new stack: **MySQL** for the database, **Bootstrap** for the frontend framework, and **PHP Sessions** for authentication.
+- **Existing Code is Reference Only:** The previous work done in Python/React is valuable as a blueprint for the required features, API responses, and business logic. Refer to it to understand what needs to be built, but do not attempt to translate the code line-for-line.
+
+**documents and test reports created in this job**
+- 
+- 
+- 
+- 
+- 
+- 
+
+**Last 10 User Messages and any pending HUMAN messages**
+1. **User (Final Feature):** Requested the implementation of a Case Details Page accessible via a hyperlink on the case number in the search results.
+2. **Agent:** Provided a checklist and started creating the backend endpoint and frontend page for the details feature.
+3. **User (PIVOT):** Requested a complete conversion of the project to PHP to run on their own hosting.
+4. **Agent:** Correctly identified the task as highly complex and provided a conceptual checklist for the PHP conversion, then asked clarifying questions about the database, UI, and auth method.
+5. **User:** Confirmed choices: a) MySQL, a) Bootstrap, c) PHP Sessions.
+6. **Agent:** Acknowledged the user's choices and laid out a new execution plan to start the PHP conversion, beginning with the project structure and database schema.
+7. **User:** Requested a feature for the case details page.
+8. **Agent:** Started implementing the feature.
+9. **User:** Requested bug fixes and improvements to the search functionality.
+10. **Agent:** Provided a checklist and started working on the backend.
+
+**Project Health Check:**
+- **Broken:** The entire Python/React/MongoDB application is now considered deprecated and will not be developed further.
+- **Mocked:** N/A
+
+**3rd Party Integrations**
+- ** SOAP API:** The core external dependency for fetching all legal case data.
+- **SendGrid/Resend (Planned):** An email integration was planned for sending notifications but has not been implemented. This will need to be integrated into the new PHP version.
+
+**Testing status**
+- **Testing agent used after significant changes:** YES. The Python/React application was tested with  after every major feature implementation, with all tests passing.
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:**
+  - 
+  - 
+  - 
+  - 
+  - 
+- **Known regressions:** None in the deprecated application.
+
+**Credentials to test flow:**
+No user-provided credentials. The application uses a self-contained JWT authentication system. For the new PHP version, a user registration flow will need to be created.
+
+**What agent forgot to execute**
+- The agent was interrupted by the pivot request while implementing the Case Details Page. This feature is now part of the new PHP project's scope.
+- The background job for monitoring cases and sending email notifications was part of the original plan but was not started. This also needs to be implemented in the new PHP version.</analysis>
