@@ -1,0 +1,82 @@
+# Portal Dosare just.ro - Apache Configuration
+# Acest fișier configurează securitatea și rutarea pentru Apache
+
+# ============================================================
+# SECURITATE
+# ============================================================
+
+# Previne accesul direct la fișierele sensibile
+<FilesMatch "^(config\.php|\.env|.*\.sql|.*\.log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Protejează directoarele sensibile
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Blochează accesul la directorul includes
+    RewriteRule ^includes/ - [F,L]
+    
+    # Blochează accesul la directorul logs
+    RewriteRule ^logs/ - [F,L]
+    
+    # Blochează accesul la fișierele .sql
+    RewriteRule \.sql$ - [F,L]
+</IfModule>
+
+# ============================================================
+# CONFIGURARE PHP (pentru hosting-uri care permit)
+# ============================================================
+
+<IfModule mod_php.c>
+    # Encoding UTF-8
+    php_value default_charset "UTF-8"
+    
+    # Crește limitele pentru upload-uri CSV
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 60
+    
+    # Securitate sesiuni
+    php_value session.cookie_httponly 1
+    php_value session.use_only_cookies 1
+</IfModule>
+
+# ============================================================
+# PERFORMANȚĂ
+# ============================================================
+
+# Compresie GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Cache pentru resurse statice
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+</IfModule>
+
+# ============================================================
+# VARIABILE DE MEDIU (decomentează și completează pentru producție)
+# ============================================================
+
+# SetEnv MYSQL_HOST localhost
+# SetEnv MYSQL_PORT 3306
+# SetEnv MYSQL_DATABASE portal_dosare
+# SetEnv MYSQL_USER portal_user
+# SetEnv MYSQL_PASSWORD parola_securizata
+# SetEnv APP_URL https://domeniul-tau.ro/php
+
+# ============================================================
+# ERORI PERSONALIZATE
+# ============================================================
+
+ErrorDocument 403 /php/pages/errors/403.php
+ErrorDocument 404 /php/pages/errors/404.php
+ErrorDocument 500 /php/pages/errors/500.php
