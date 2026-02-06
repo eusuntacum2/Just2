@@ -1,348 +1,235 @@
 /**
- * Portal Dosare - JavaScript
+ * Portal Dosare - JavaScript Application
  */
 
-// Theme Management
-const ThemeManager = {
-    init() {
-        const savedTheme = localStorage.getItem('pd_theme') || 'light';
-        this.setTheme(savedTheme);
-        
-        document.querySelectorAll('[data-toggle-theme]').forEach(el => {
-            el.addEventListener('click', () => this.toggleTheme());
-        });
-    },
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme
+    initTheme();
     
-    setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('pd_theme', theme);
-        
-        // Update icons
-        document.querySelectorAll('.theme-icon-light').forEach(el => {
-            el.style.display = theme === 'dark' ? 'inline' : 'none';
-        });
-        document.querySelectorAll('.theme-icon-dark').forEach(el => {
-            el.style.display = theme === 'light' ? 'inline' : 'none';
-        });
-    },
+    // Initialize theme toggle
+    initThemeToggle();
     
-    toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        this.setTheme(current === 'light' ? 'dark' : 'light');
-    }
-};
-
-// Toast Notifications
-const Toast = {
-    container: null,
+    // Initialize tooltips
+    initTooltips();
     
-    init() {
-        this.container = document.createElement('div');
-        this.container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-        this.container.style.zIndex = '1050';
-        document.body.appendChild(this.container);
-    },
-    
-    show(message, type = 'info', duration = 4000) {
-        if (!this.container) this.init();
-        
-        const iconMap = {
-            success: 'bi-check-circle-fill text-success',
-            error: 'bi-exclamation-circle-fill text-danger',
-            warning: 'bi-exclamation-triangle-fill text-warning',
-            info: 'bi-info-circle-fill text-info'
-        };
-        
-        const toastEl = document.createElement('div');
-        toastEl.className = 'toast show';
-        toastEl.setAttribute('role', 'alert');
-        toastEl.innerHTML = `
-            <div class="toast-body d-flex align-items-center gap-2">
-                <i class="bi ${iconMap[type] || iconMap.info}"></i>
-                <span>${message}</span>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-        
-        this.container.appendChild(toastEl);
-        
-        // Auto remove
-        setTimeout(() => {
-            toastEl.classList.remove('show');
-            setTimeout(() => toastEl.remove(), 300);
-        }, duration);
-        
-        // Manual close
-        toastEl.querySelector('.btn-close').addEventListener('click', () => {
-            toastEl.classList.remove('show');
-            setTimeout(() => toastEl.remove(), 300);
-        });
-    },
-    
-    success(message) { this.show(message, 'success'); },
-    error(message) { this.show(message, 'error'); },
-    warning(message) { this.show(message, 'warning'); },
-    info(message) { this.show(message, 'info'); }
-};
-
-// API Helper
-const API = {
-    async request(url, options = {}) {
-        const defaults = {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        };
-        
-        const config = { ...defaults, ...options };
-        if (options.body && typeof options.body === 'object') {
-            config.body = JSON.stringify(options.body);
-        }
-        
-        try {
-            const response = await fetch(url, config);
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.error || 'Eroare necunoscută');
-            }
-            
-            return data;
-        } catch (error) {
-            Toast.error(error.message);
-            throw error;
-        }
-    },
-    
-    get(url) {
-        return this.request(url, { method: 'GET' });
-    },
-    
-    post(url, body) {
-        return this.request(url, { method: 'POST', body });
-    },
-    
-    delete(url) {
-        return this.request(url, { method: 'DELETE' });
-    }
-};
-
-// Search Page
-const SearchPage = {
-    init() {
-        const searchForm = document.getElementById('searchForm');
-        const searchBtn = document.getElementById('searchBtn');
-        const resultsContainer = document.getElementById('searchResults');
-        
-        if (!searchForm) return;
-        
-        searchForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.doSearch();
-        });
-        
-        // Export buttons
-        document.querySelectorAll('[data-export]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const format = btn.dataset.export;
-                this.exportResults(format);
-            });
-        });
-    },
-    
-    async doSearch(page = 1) {
-        const textarea = document.getElementById('searchTerms');
-        const terms = textarea.value.split('\n').map(t => t.trim()).filter(t => t);
-        
-        if (terms.length === 0) {
-            Toast.error('Introduceți cel puțin un termen de căutare');
-            return;
-        }
-        
-        const searchBtn = document.getElementById('searchBtn');
-        const resultsContainer = document.getElementById('searchResults');
-        
-        searchBtn.disabled = true;
-        searchBtn.innerHTML = '<span class="loading-spinner me-2"></span>Se caută...';
-        
-        try {
-            const response = await API.post('/php/api/search.php', {
-                termeni: terms,
-                page: page,
-                page_size: 20
-            });
-            
-            this.renderResults(response, terms);
-            
-            if (response.total_count === 0) {
-                Toast.info('Nu s-au găsit rezultate');
-            } else {
-                Toast.success(`${response.total_count} dosar(e) găsit(e)`);
-            }
-        } catch (error) {
-            console.error('Search error:', error);
-        } finally {
-            searchBtn.disabled = false;
-            searchBtn.innerHTML = '<i class="bi bi-search me-2"></i>Caută';
-        }
-    },
-    
-    renderResults(data, terms) {
-        const container = document.getElementById('searchResults');
-        if (!container) return;
-        
-        if (!data.rows || data.rows.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="bi bi-search"></i></div>
-                    <h5>Niciun rezultat</h5>
-                    <p class="text-muted">Încearcă alți termeni de căutare.</p>
-                </div>
-            `;
-            return;
-        }
-        
-        let html = `
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">
-                    Rezultate <span class="text-muted fw-normal">(${data.total_count} dosar${data.total_count !== 1 ? 'e' : ''})</span>
-                </h5>
-                <small class="text-muted">Pag. ${data.page}/${data.total_pages}</small>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-compact mb-0">
-                    <thead>
-                        <tr>
-                            <th>Termen</th>
-                            <th>Tip</th>
-                            <th>Nr. Dosar</th>
-                            <th>Instanță</th>
-                            <th>Obiect</th>
-                            <th>Stadiu</th>
-                            <th>Data</th>
-                            <th>Modif.</th>
-                            <th>Parte</th>
-                            <th>Observații</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-        
-        data.rows.forEach(row => {
-            const tipBadge = row.tip_detectat === 'Număr dosar' 
-                ? '<span class="badge-dosar">Dosar</span>'
-                : '<span class="badge-parte">Parte</span>';
-            
-            const dosarLink = row.numar_dosar 
-                ? `<a href="case-details.php?numar=${encodeURIComponent(row.numar_dosar)}" class="dosar-link">${row.numar_dosar}</a>`
-                : '-';
-            
-            html += `
-                <tr>
-                    <td class="text-truncate" style="max-width:100px" title="${row.termen_cautare}">${row.termen_cautare}</td>
-                    <td>${tipBadge}</td>
-                    <td class="font-monospace">${dosarLink}</td>
-                    <td class="text-truncate" style="max-width:150px" title="${row.instanta}">${row.instanta || '-'}</td>
-                    <td class="text-truncate" style="max-width:150px" title="${row.obiect}">${row.obiect || '-'}</td>
-                    <td>${row.stadiu_procesual || '-'}</td>
-                    <td class="font-monospace">${row.data || '-'}</td>
-                    <td class="font-monospace">${row.ultima_modificare || '-'}</td>
-                    <td class="text-truncate" style="max-width:120px" title="${row.nume_parte}">${row.nume_parte || '-'}</td>
-                    <td class="text-muted fst-italic">${row.observatii || '-'}</td>
-                </tr>
-            `;
-        });
-        
-        html += '</tbody></table></div>';
-        
-        // Pagination
-        if (data.total_pages > 1) {
-            html += this.renderPagination(data);
-        }
-        
-        container.innerHTML = html;
-        
-        // Store terms for pagination
-        this.currentTerms = terms;
-        
-        // Bind pagination events
-        container.querySelectorAll('[data-page]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.doSearch(parseInt(btn.dataset.page));
-            });
-        });
-    },
-    
-    renderPagination(data) {
-        let html = '<nav class="d-flex justify-content-center mt-3"><ul class="pagination pagination-sm mb-0">';
-        
-        // Previous
-        html += `
-            <li class="page-item ${data.page <= 1 ? 'disabled' : ''}">
-                <button class="page-link" data-page="${data.page - 1}">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-            </li>
-        `;
-        
-        // Page numbers
-        let startPage = Math.max(1, data.page - 2);
-        let endPage = Math.min(data.total_pages, startPage + 4);
-        startPage = Math.max(1, endPage - 4);
-        
-        for (let i = startPage; i <= endPage; i++) {
-            html += `
-                <li class="page-item ${i === data.page ? 'active' : ''}">
-                    <button class="page-link" data-page="${i}">${i}</button>
-                </li>
-            `;
-        }
-        
-        // Next
-        html += `
-            <li class="page-item ${data.page >= data.total_pages ? 'disabled' : ''}">
-                <button class="page-link" data-page="${data.page + 1}">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            </li>
-        `;
-        
-        html += '</ul></nav>';
-        return html;
-    },
-    
-    exportResults(format) {
-        const textarea = document.getElementById('searchTerms');
-        const terms = textarea.value.split('\n').map(t => t.trim()).filter(t => t);
-        
-        if (terms.length === 0) {
-            Toast.error('Introduceți termeni de căutare înainte de export');
-            return;
-        }
-        
-        // Create form and submit
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/php/api/export.php?format=${format}`;
-        
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'termeni';
-        input.value = JSON.stringify(terms);
-        form.appendChild(input);
-        
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-        
-        Toast.success(`Export ${format.toUpperCase()} în curs...`);
-    }
-};
-
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-    ThemeManager.init();
-    Toast.init();
-    SearchPage.init();
+    // Initialize form validation
+    initFormValidation();
 });
+
+/**
+ * Theme Management
+ */
+function initTheme() {
+    const savedTheme = localStorage.getItem('pd-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcons(savedTheme);
+}
+
+function initThemeToggle() {
+    const toggleButtons = document.querySelectorAll('[data-toggle-theme]');
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pd-theme', newTheme);
+            updateThemeIcons(newTheme);
+        });
+    });
+}
+
+function updateThemeIcons(theme) {
+    document.querySelectorAll('.theme-icon-light').forEach(icon => {
+        icon.style.display = theme === 'dark' ? 'inline-block' : 'none';
+    });
+    document.querySelectorAll('.theme-icon-dark').forEach(icon => {
+        icon.style.display = theme === 'light' ? 'inline-block' : 'none';
+    });
+}
+
+/**
+ * Initialize Bootstrap Tooltips
+ */
+function initTooltips() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+}
+
+/**
+ * Form Validation
+ */
+function initFormValidation() {
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+}
+
+/**
+ * Show Loading Overlay
+ */
+function showLoading(message = 'Se încărcă...') {
+    const overlay = document.createElement('div');
+    overlay.className = 'spinner-overlay';
+    overlay.id = 'loading-overlay';
+    overlay.innerHTML = `
+        <div class="text-center text-white">
+            <div class="spinner-border mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div>${message}</div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+/**
+ * AJAX Helper
+ */
+async function fetchJSON(url, options = {}) {
+    const defaults = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    };
+    
+    const config = { ...defaults, ...options };
+    
+    try {
+        const response = await fetch(url, config);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Eroare de server');
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Toast Notifications
+ */
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-bg-${type} border-0 show`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    return container;
+}
+
+/**
+ * Confirm Dialog
+ */
+function confirmAction(message) {
+    return new Promise((resolve) => {
+        const result = confirm(message);
+        resolve(result);
+    });
+}
+
+/**
+ * Copy to Clipboard
+ */
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Copiat în clipboard!', 'success');
+    }).catch(() => {
+        showToast('Eroare la copiere', 'danger');
+    });
+}
+
+/**
+ * Debounce Helper
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Format Date
+ */
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ro-RO');
+    } catch {
+        return dateString;
+    }
+}
+
+/**
+ * Export to CSV
+ */
+function exportTableToCSV(tableId, filename) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        const rowData = [];
+        cols.forEach(col => {
+            let text = col.innerText.replace(/"/g, '""');
+            rowData.push(`"${text}"`);
+        });
+        csv.push(rowData.join(','));
+    });
+    
+    const csvContent = '\uFEFF' + csv.join('\n'); // BOM for UTF-8
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename || 'export.csv';
+    link.click();
+}
